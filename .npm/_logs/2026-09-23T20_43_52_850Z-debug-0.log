@@ -1,0 +1,18 @@
+0 verbose cli /opt/homebrew/Cellar/node/26.5.0/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.17.0
+2 info using node@v26.5.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npmrc
+5 silly config load:file:/opt/homebrew/etc/npmrc
+6 verbose title npm exec hardhat test test/AnyDexAISingle.test.js test/PackageEdit.test.js test/ProductionHardening.test.js test/06_ReferralEdgeCases.test.js test/13_AdminControls.test.js test/16_NFTTransfer.test.js test/17_Boundary.test.js test/18_EconomicInvariants.test.js test/19_Integration.test.js test/Phase4_ERC20Failure.test.js test/Phase5_Reentrancy.test.js
+7 verbose argv "exec" "--" "hardhat" "test" "test/AnyDexAISingle.test.js" "test/PackageEdit.test.js" "test/ProductionHardening.test.js" "test/06_ReferralEdgeCases.test.js" "test/13_AdminControls.test.js" "test/16_NFTTransfer.test.js" "test/17_Boundary.test.js" "test/18_EconomicInvariants.test.js" "test/19_Integration.test.js" "test/Phase4_ERC20Failure.test.js" "test/Phase5_Reentrancy.test.js"
+8 verbose logfile logs-max:10 dir:/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npm/_logs/2026-09-23T20_43_52_850Z-
+9 verbose logfile /Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npm/_logs/2026-09-23T20_43_52_850Z-debug-0.log
+10 silly logfile start cleaning logs, removing 1 files
+11 silly logfile done cleaning log files
+12 verbose cwd /Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts
+13 verbose os Darwin 24.6.0
+14 verbose node v26.5.0
+15 verbose npm  v11.17.0
+16 verbose exit 0
+17 info ok

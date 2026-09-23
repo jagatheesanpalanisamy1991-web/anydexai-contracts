@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANYDEXAI - 100% Decentralized Smart Contract Staking & Referral</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Ethers.js v6 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+  <!-- Contract Configuration (Compiled from AnyDexAISingle.sol) -->
+  <script src="contracts-config.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#080d1a',
+              card: '#0f172a',
+              border: '#1e293b',
+              emerald: '#10b981',
+              cyan: '#06b6d4',
+              gold: '#f59e0b',
+              purple: '#8b5cf6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.7); }
+    }
+    .glow-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .glow-card:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-gradient {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-gradient:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-gold:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+    }
+    .nft-badge-locked {
+      filter: grayscale(100%);
+      opacity: 0.45;
+    }
+    .nft-badge-active {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+      border-color: #f59e0b !important;
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 bg-brand-dark/90 backdrop-blur-md border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-cube text-white text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">ANYDEXAI</span>
+            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">BEP20</span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono">anydexai.com &bull; Single Smart Contract Engine</p>
+        </div>
+      </div>
+
+      <!-- Network and Wallet Connection -->
+      <div class="flex items-center space-x-4">
+        <div id="networkBadge" class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-xs font-mono text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="networkName">Hardhat Local</span>
+        </div>
+
+        <button id="btnConnect" onclick="connectWallet()" class="btn-gradient px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center space-x-2 text-white shadow-md">
+          <i class="fa-solid fa-wallet"></i>
+          <span id="walletBtnText">Connect Wallet</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- USER IDENTITY PROFILE (LOCAL DB / LOCALSTORAGE) -->
+    <div id="userProfileBanner" class="glow-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-emerald-500">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+          <i class="fa-solid fa-id-badge"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 class="font-bold text-white text-base" id="profileDisplayName">Guest Investor</h3>
+            <span id="profileStatusBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400">Not Connected</span>
+          </div>
+          <div class="text-xs text-slate-400 flex flex-wrap gap-x-4 gap-y-1 mt-1 font-mono">
+            <span><i class="fa-solid fa-phone text-slate-500 mr-1"></i><span id="profileDisplayMobile">N/A</span></span>
+            <span><i class="fa-solid fa-user-tag text-slate-500 mr-1"></i>Sponsor: <span id="profileDisplaySponsor" class="text-slate-300">None</span></span>
+            <span><i class="fa-solid fa-calendar-check text-slate-500 mr-1"></i>Since: <span id="profileDisplayRegistered">N/A</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="openProfileModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition">
+          <i class="fa-regular fa-pen-to-square text-emerald-400"></i>
+          <span>Edit Profile</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- USER SUMMARY METRICS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="glow-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <span>ACTIVE CAPITAL</span>
+          <i class="fa-solid fa-vault text-emerald-400"></i>
+        </div>
+        <div class="text-2xl font-bold font-mono text-white" id="statActiveCapital">$0.00</div>
+        <p class="text-[11px] text-slate-400 mt-1">Total: <span id="statTotalInvested" class="text-slate-300 font-semibold">$0.00</span> USDT</p>
+      </div>
+
+      <div class="glow-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <span>ACCRUED ROI</span>
+          <i class="fa-solid fa-chart-line text-cyan-400"></i>
+        </div>
+        <div class="text-2xl font-bold font-mono text-cyan-400" id="statPendingROI">$0.00</div>
+        <p class="text-[11px] text-slate-400 mt-1">Claimed: <span id="statRoiClaimed" class="text-slate-300 font-semibold">$0.00</span> / 200%</p>
+      </div>
+
+      <div class="glow-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <span>ADAI COIN BALANCE</span>
+          <i class="fa-solid fa-coins text-gold"></i>
+        </div>
+        <div class="text-2xl font-bold font-mono text-gold" id="statAdaiBalance">0.00</div>
+        <p class="text-[11px] text-slate-400 mt-1">Capital Return via ADAI</p>
+      </div>
+
+      <div class="glow-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <span>CLAIMABLE LEVEL INC.</span>
+          <i class="fa-solid fa-hand-holding-dollar text-emerald-400"></i>
+        </div>
+        <div class="text-2xl font-bold font-mono text-emerald-400" id="statClaimableUSDT">$0.00</div>
+        <p class="text-[11px] text-slate-400 mt-1">Min $10 &bull; Instant Transfer</p>
+      </div>
+
+      <div class="glow-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <span>TEAM VOLUME</span>
+          <i class="fa-solid fa-users-viewfinder text-purple-400"></i>
+        </div>
+        <div class="text-2xl font-bold font-mono text-white" id="statTeamVolume">$0.00</div>
+        <p class="text-[11px] text-slate-400 mt-1">Direct Referrals: <span id="statDirectCount" class="text-slate-300 font-semibold">0</span></p>
+      </div>
+    </div>
+
+    <!-- 120-DAY ACTIVITY MONITOR & 2X MONTHLY CEILING ALERTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- 120-Day Rule Banner -->
+      <div class="glow-card p-6 rounded-2xl border-l-4 border-l-cyan-500">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">120-Day Referral Activity Status</h3>
+              <p class="text-xs text-slate-400">Required to withdraw all Level Income</p>
+            </div>
+          </div>
+          <span id="badge120Day" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            Active
+          </span>
+        </div>
+        <div class="mt-4 flex items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+          <div class="text-xs text-slate-400">Next Referral Deadline:</div>
+          <div class="text-sm font-mono font-bold text-cyan-300" id="countdown120Day">Calculating...</div>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">
+          <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i>
+          Active rule: refer at least 1 new member every 120 days to keep level income unlocked.
+        </p>
+      </div>
+
+      <!-- 2x Monthly Affiliate Ceiling Tracker -->
+      <div class="glow-card p-6 rounded-2xl border-l-4 border-l-emerald-500">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">2x Monthly Earnings Ceiling</h3>
+              <p class="text-xs text-slate-400">Direct referral + Level income cap (Carries forward!)</p>
+            </div>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-300" id="ceilingMonthlyRatio">$0.00 / $0.00</span>
+        </div>
+        <div class="mt-4">
+          <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-800">
+            <div id="ceilingProgressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">
+            <i class="fa-solid fa-piggy-bank text-emerald-400 mr-1"></i>
+            Pending Remainder Queue: <strong id="pendingRemainderAmount" class="text-emerald-400 font-mono">$0.00</strong>
+          </span>
+          <span class="text-slate-500 font-mono text-[10px]">Zero Fund Loss Guarantee (SEC-01)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVESTMENT PACKAGES SECTION -->
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-xl font-black tracking-tight text-white flex items-center space-x-2">
+            <span>STAKING PACKAGES</span>
+            <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded">USDT BEP20</span>
+          </h2>
+          <p class="text-xs text-slate-400">Choose a package to earn monthly ROI up to 200% with full ADAI capital return</p>
+        </div>
+        <div class="text-xs text-slate-400">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1"></span>
+          0.5% Token + 0.5% NFT Liquidity included
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="packagesContainer">
+        <!-- Package 1: $1,000 -->
+        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Starter Pack</span>
+              <span class="text-xs font-mono text-slate-400">Plan #1</span>
+            </div>
+            <div class="text-3xl font-black font-mono text-white mb-2">$1,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
+            <div class="space-y-3 py-4 border-y border-slate-800 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Monthly ROI</span>
+                <span class="font-bold text-emerald-400 font-mono" id="pkg1Roi">5.0% / 30 Days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Maximum Return</span>
+                <span class="font-bold text-white font-mono">200% ($2,000)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Welcome Tokens</span>
+                <span class="font-bold text-gold font-mono">10 ADAI</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Sponsor Token Bonus</span>
+                <span class="font-bold text-gold font-mono">5 ADAI (50%)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">NFT Reward</span>
+                <span class="font-bold text-cyan-300">1x Entry Pass NFT</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="handleInvestModal(1, 1000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+            <span>Invest $1,000</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Package 2: $5,000 -->
+        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border-2 border-emerald-500/50 shadow-xl shadow-emerald-500/10">
+          <div class="absolute -right-12 top-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-900 font-black text-[10px] uppercase tracking-widest py-1 px-12 rotate-45 shadow-md">
+            POPULAR
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Pro Growth</span>
+              <span class="text-xs font-mono text-slate-400">Plan #2</span>
+            </div>
+            <div class="text-3xl font-black font-mono text-white mb-2">$5,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
+            <div class="space-y-3 py-4 border-y border-slate-800 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Monthly ROI</span>
+                <span class="font-bold text-emerald-400 font-mono" id="pkg2Roi">5.5% / 30 Days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Maximum Return</span>
+                <span class="font-bold text-white font-mono">200% ($10,000)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Welcome Tokens</span>
+                <span class="font-bold text-gold font-mono">50 ADAI</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Sponsor Token Bonus</span>
+                <span class="font-bold text-gold font-mono">25 ADAI (50%)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">NFT Reward</span>
+                <span class="font-bold text-cyan-300">1x Entry Pass NFT</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="handleInvestModal(2, 5000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+            <span>Invest $5,000</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Package 3: $10,000 -->
+        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Elite Master</span>
+              <span class="text-xs font-mono text-slate-400">Plan #3</span>
+            </div>
+            <div class="text-3xl font-black font-mono text-white mb-2">$10,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
+            <div class="space-y-3 py-4 border-y border-slate-800 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Monthly ROI</span>
+                <span class="font-bold text-emerald-400 font-mono" id="pkg3Roi">6.0% / 30 Days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Maximum Return</span>
+                <span class="font-bold text-white font-mono">200% ($20,000)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Welcome Tokens</span>
+                <span class="font-bold text-gold font-mono">100 ADAI</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Sponsor Token Bonus</span>
+                <span class="font-bold text-gold font-mono">50 ADAI (50%)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">NFT Reward</span>
+                <span class="font-bold text-cyan-300">1x Entry Pass NFT</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="handleInvestModal(3, 10000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+            <span>Invest $10,000</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- YOUR ACTIVE INVESTMENTS TRACKER -->
+    <div class="glow-card p-6 rounded-3xl space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h3 class="font-black text-white text-lg flex items-center space-x-2">
+            <i class="fa-solid fa-receipt text-cyan-400"></i>
+            <span>Your Active Stakes & ROI Progress</span>
+          </h3>
+          <p class="text-xs text-slate-400">Track and claim returns for each investment deposit</p>
+        </div>
+        <div class="text-xs font-mono text-slate-400">
+          Total Stakes: <span id="userStakesCount" class="font-bold text-emerald-400">0</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-mono">
+              <th class="py-2.5">Stake #</th>
+              <th class="py-2.5">Capital</th>
+              <th class="py-2.5">ROI Rate</th>
+              <th class="py-2.5">Claimed / 200% Cap</th>
+              <th class="py-2.5">Accrued Claimable</th>
+              <th class="py-2.5">Status</th>
+              <th class="py-2.5 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="stakesTableBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+            <tr>
+              <td colspan="7" class="py-6 text-center text-slate-500 font-sans">
+                Connect your wallet to load active investment stakes.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLAIMS & LEVEL INCOME WITHDRAWAL SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Level Income Box -->
+      <div class="glow-card p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+              <i class="fa-solid fa-sitemap"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white">5-Tier Level Income</h3>
+              <p class="text-[11px] text-slate-400">Accrued from downline level 1 to 5 volume</p>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 mb-4 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-400">Accrued Level Volume Earnings:</span>
+              <span class="text-lg font-mono font-bold text-cyan-400" id="cardPendingLevel">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-500">Unpaid Carry-Forward Remainder:</span>
+              <span class="font-mono text-slate-300" id="cardRemainderLevel">$0.00</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="claimLevelIncome()" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-arrow-down-to-bracket"></i>
+          <span>Withdraw Level Income</span>
+        </button>
+      </div>
+
+      <!-- Direct Referral & Affiliate Commissions Box -->
+      <div class="glow-card p-6 rounded-2xl flex flex-col justify-between border-2 border-emerald-500/30">
+        <div>
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <i class="fa-solid fa-bolt text-emerald-400"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white">Immediate Direct Referral Payouts</h3>
+              <p class="text-[11px] text-slate-400">7% L1, 2% L2, 1% L3 deposited directly to your wallet</p>
+            </div>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/20 mb-4">
+            <div class="text-xs text-slate-400 mb-1">Referral Architecture:</div>
+            <p class="text-xs text-slate-300">
+              Direct referral commissions are transferred <strong>automatically and immediately</strong> into your USDT wallet at the moment your downlines deposit. No manual claim transaction required!
+            </p>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-400 flex justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+          <span>Current Month Affiliate Earnings:</span>
+          <span class="text-emerald-400 font-mono font-bold" id="cardCurrentMonthAffiliate">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9-TIER NFT GRADES & ENTRY PASS SHOWCASE -->
+    <div class="glow-card p-6 rounded-3xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-black text-white flex items-center space-x-2">
+            <span>ANYDEXAI NFT PROGRAM</span>
+            <span class="text-xs font-normal text-gold bg-gold/10 px-2 py-0.5 rounded border border-gold/30">9 Total NFTs (ERC-721 + ERC-165)</span>
+          </h2>
+          <p class="text-xs text-slate-400">Every registration receives 1 Entry Pass NFT. Climb through 8 Royal Grade NFTs based on team business!</p>
+        </div>
+        <div class="text-xs text-slate-400 mt-2 md:mt-0 font-mono">
+          Highest Grade: <span id="userHighestGradeText" class="font-bold text-gold">None</span> &bull; Total Owned: <span id="userNftCount" class="font-bold text-gold">0</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4" id="nftContainer">
+        <!-- Dynamically Populated by renderNftGrid() -->
+      </div>
+    </div>
+
+    <!-- REFERRAL LINK & DOWNLINE TREE SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Referral Link Box -->
+      <div class="glow-card p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <h3 class="font-bold text-white text-base mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-share-nodes text-emerald-400"></i>
+            <span>Your Affiliate Link</span>
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">Share your link to earn 7% Direct Sponsor, 2% Upline 2, 1% Upline 3 immediately + 50% ADAI sponsor bonus!</p>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between mb-3">
+            <span id="refLinkText" class="text-xs font-mono text-slate-400 truncate">Connect wallet to generate</span>
+            <button onclick="copyRefLink()" class="ml-2 text-emerald-400 hover:text-emerald-300 text-sm p-1.5 rounded-lg bg-emerald-500/10">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-400 space-y-1">
+          <div>&bull; Direct Sponsor: <span class="text-emerald-400 font-bold">7%</span> immediate</div>
+          <div>&bull; Upline 2: <span class="text-emerald-400 font-bold">2%</span> immediate</div>
+          <div>&bull; Upline 3: <span class="text-emerald-400 font-bold">1%</span> immediate</div>
+          <div>&bull; Sponsor Tokens: <span class="text-gold font-bold">50%</span> of welcome pack</div>
+        </div>
+      </div>
+
+      <!-- Level Income Eligibility Criteria Table -->
+      <div class="glow-card p-6 rounded-2xl lg:col-span-2">
+        <h3 class="font-bold text-white text-base mb-3 flex items-center space-x-2">
+          <i class="fa-solid fa-layer-group text-cyan-400"></i>
+          <span>Level Income Structure & Downline Stats (Levels 1 to 5)</span>
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400">
+                <th class="py-2">Level</th>
+                <th class="py-2">ROI / 30d</th>
+                <th class="py-2">Criteria</th>
+                <th class="py-2">Downline Members</th>
+                <th class="py-2">Team Volume</th>
+                <th class="py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody id="levelTableBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OWNER / ADMIN PANEL (DISPLAYED ONLY IF CONNECTED WALLET IS OWNER) -->
+    <div id="adminPanel" class="hidden glow-card p-6 rounded-3xl border-2 border-gold/40 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gold/10 text-gold flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-white text-lg">Owner Administration Panel</h3>
+            <p class="text-xs text-slate-400">Smart Contract parameters & treasury controls (SEC-02 immutable snapshots protect active users)</p>
+          </div>
+        </div>
+        <span class="text-xs font-mono font-bold px-3 py-1 rounded bg-gold/20 text-gold border border-gold/40">OWNER ACCESS</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Edit Package ROI & Duration -->
+        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-xs uppercase text-slate-300">Update Package ROI & Days</h4>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Package ID</label>
+            <input type="number" id="adminPkgId" value="1" min="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">New ROI (Basis Points, 500 = 5%)</label>
+            <input type="number" id="adminPkgRoiBps" value="550" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">New Duration (Days)</label>
+            <input type="number" id="adminPkgDuration" value="30" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <button onclick="adminUpdatePackage()" class="w-full btn-gold py-2 rounded-xl font-bold text-xs text-slate-900">
+            Apply Package Update
+          </button>
+        </div>
+
+        <!-- Add New Package -->
+        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-xs uppercase text-slate-300">Add New Package</h4>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Amount (USDT)</label>
+            <input type="number" id="adminNewAmount" value="25000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">ROI (Basis Points, 700 = 7%)</label>
+            <input type="number" id="adminNewRoiBps" value="700" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Duration (Days)</label>
+            <input type="number" id="adminNewDuration" value="30" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Token Reward (ADAI)</label>
+            <input type="number" id="adminNewTokenReward" value="250" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <button onclick="adminAddNewPackage()" class="w-full btn-gold py-2 rounded-xl font-bold text-xs text-slate-900">
+            Create Package
+          </button>
+        </div>
+
+        <!-- Treasury Withdrawal -->
+        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-xs uppercase text-slate-300">Admin Treasury Withdrawal</h4>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Amount (USDT)</label>
+            <input type="number" id="adminWithdrawAmount" placeholder="1000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Recipient Address</label>
+            <input type="text" id="adminWithdrawRecipient" placeholder="0x..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono" />
+          </div>
+          <button onclick="adminWithdrawTreasury()" class="w-full bg-red-600 hover:bg-red-500 py-2 rounded-xl font-bold text-xs text-white transition">
+            Withdraw Treasury USDT
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- USER PROFILE MODAL (NAME & MOBILE NUMBER) -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glow-card max-w-md w-full p-6 rounded-3xl border border-slate-700 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+          <i class="fa-solid fa-user-pen text-emerald-400"></i>
+          <span>Edit Investor Profile</span>
+        </h3>
+        <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Stored in your secure browser local database and linked to your wallet address.
+      </p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Investor Full Name</label>
+          <input type="text" id="editProfileName" placeholder="e.g. Arun Kumar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Contact Number</label>
+          <input type="text" id="editProfileMobile" placeholder="e.g. +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="saveProfileData()" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white">
+          Save Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRATION / INVESTMENT MODAL -->
+  <div id="investModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glow-card max-w-md w-full p-6 rounded-3xl border border-slate-700 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+          <i class="fa-solid fa-wallet text-emerald-400"></i>
+          <span>Confirm Investment</span>
+        </h3>
+        <button onclick="closeInvestModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-1">
+        <div class="text-xs text-slate-400">Selected Package:</div>
+        <div class="text-xl font-bold font-mono text-emerald-400" id="modalPackageName">Starter Pack ($1,000 USDT)</div>
+      </div>
+
+      <!-- Registration fields (Name & Mobile for local DB) -->
+      <div id="registrationFields" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Your Full Name</label>
+          <input type="text" id="regName" placeholder="e.g. Arun Kumar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Number</label>
+          <input type="text" id="regMobile" placeholder="e.g. +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Sponsor / Referrer Address</label>
+          <input type="text" id="regSponsor" placeholder="0x..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button id="btnApproveUsdt" onclick="approveUSDT()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 py-3 rounded-xl font-bold text-xs text-white flex items-center justify-center space-x-2">
+          <span>1. Approve USDT</span>
+        </button>
+        <button id="btnConfirmInvest" onclick="executeInvest()" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+          <span>2. Confirm Stake</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm bg-slate-900 border border-emerald-500/50 shadow-2xl rounded-2xl p-4 flex items-start space-x-3">
+    <div id="toastIcon" class="text-emerald-400 text-lg mt-0.5">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <div class="flex-1">
+      <h4 id="toastTitle" class="text-xs font-bold text-white">Success</h4>
+      <p id="toastMessage" class="text-xs text-slate-400 mt-0.5"></p>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT LOGIC (ANYDEXAISINGLE SMART CONTRACT ENGINE) -->
+  <script>
+    let provider, signer, userAddress;
+    let mainContract, usdtContract, adaiContract, nftContract;
+    let activePackageId = 1, activePackagePrice = 1000;
+    let isOwner = false;
+
+    const NFT_TIERS = [
+      { id: 0, name: "Entry Pass", desc: "Welcome Pass", req: "On 1st Deposit", icon: "fa-ticket" },
+      { id: 1, name: "Token Squire", desc: "Grade 1", req: "L1: 3 Users, $5k", icon: "fa-shield" },
+      { id: 2, name: "Coin Knight", desc: "Grade 2", req: "L2: 9 Users, $15k", icon: "fa-chess-knight" },
+      { id: 3, name: "Captain Creator", desc: "Grade 3", req: "L3: 27 Users, $45k", icon: "fa-crown" },
+      { id: 4, name: "Lord Validator", desc: "Grade 4", req: "L4: 81 Users, $135k", icon: "fa-gem" },
+      { id: 5, name: "Baren Hash", desc: "Grade 5", req: "L5: 243 Users, $405k", icon: "fa-dragon" },
+      { id: 6, name: "Alpha Duke", desc: "Grade 6", req: "L6: 729 Users, $1.21M", icon: "fa-star" },
+      { id: 7, name: "Royal Archon", desc: "Grade 7", req: "L7: 2,187 Users, $3.64M", icon: "fa-certificate" },
+      { id: 8, name: "AnyDex Sovereign", desc: "Supreme Rank", req: "L8: 6,561 Users, $10.93M", icon: "fa-trophy" }
+    ];
+
+    const LEVEL_REQUIREMENTS = [
+      { level: 1, roi: "1.00%", req: "5 members & $5,000 in L1" },
+      { level: 2, roi: "0.50%", req: "2 members in L2 & $9,000 in L2" },
+      { level: 3, roi: "0.50%", req: "2 members in L3 & $14,000 in L3" },
+      { level: 4, roi: "0.25%", req: "4 members in L4 & $18,000 in L4" },
+      { level: 5, roi: "0.25%", req: "5 members in L5 & $25,000 in L5" }
+    ];
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      renderNftGrid([], 0);
+      renderLevelTable([], []);
+      checkUrlReferrer();
+
+      if (window.ethereum) {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        if (accounts.length > 0) {
+          connectWallet();
+        }
+      }
+    });
+
+    function checkUrlReferrer() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get("ref");
+      if (ref && ethers.isAddress(ref)) {
+        document.getElementById("regSponsor").value = ref;
+      }
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        showToast("Wallet Missing", "Please install MetaMask or TrustWallet to connect.", true);
+        return;
+      }
+      try {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        document.getElementById("walletBtnText").innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+        document.getElementById("refLinkText").innerText = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+
+        // Initialize contract instances from contracts-config.js
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId);
+        let cfg = window.ANYDEX_CONFIG.networks.local;
+        if (chainId === 97) cfg = window.ANYDEX_CONFIG.networks.bscTestnet;
+        if (chainId === 56) cfg = window.ANYDEX_CONFIG.networks.bscMainnet;
+
+        document.getElementById("networkName").innerText = cfg.name;
+
+        // Use AnyDexAIMainPlan ABI compiled from AnyDexAISingle.sol
+        mainContract = new ethers.Contract(cfg.mainContract, window.ANYDEX_CONFIG.abis.AnyDexAIMainPlan, signer);
+        usdtContract = new ethers.Contract(cfg.usdtToken, window.ANYDEX_CONFIG.abis.USDT, signer);
+        adaiContract = new ethers.Contract(cfg.adaiToken, window.ANYDEX_CONFIG.abis.ADAIToken, signer);
+        nftContract = new ethers.Contract(cfg.nftContract, window.ANYDEX_CONFIG.abis.AnyDexAINFT, signer);
+
+        // Check if connected address is owner
+        try {
+          const ownerAddr = await mainContract.owner();
+          isOwner = (ownerAddr.toLowerCase() === userAddress.toLowerCase());
+          if (isOwner) {
+            document.getElementById("adminPanel").classList.remove("hidden");
+            document.getElementById("adminWithdrawRecipient").value = userAddress;
+          }
+        } catch (e) {
+          console.warn("Could not check contract owner:", e);
+        }
+
+        // Load local user profile
+        loadLocalProfile();
+
+        showToast("Connected", `Wallet connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`);
+        await refreshUserData();
+
+        // Refresh periodically
+        setInterval(refreshUserData, 15000);
+      } catch (err) {
+        console.error("Wallet connection error:", err);
+        showToast("Error", err.message || "Failed to connect wallet", true);
+      }
+    }
+
+    function loadLocalProfile() {
+      if (!userAddress) return;
+      const stored = localStorage.getItem(`anydex_user_${userAddress.toLowerCase()}`);
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          document.getElementById("profileDisplayName").innerText = data.name || "Investor";
+          document.getElementById("profileDisplayMobile").innerText = data.mobile || "N/A";
+          document.getElementById("editProfileName").value = data.name || "";
+          document.getElementById("editProfileMobile").value = data.mobile || "";
+        } catch (e) {}
+      }
+    }
+
+    function openProfileModal() {
+      if (!userAddress) {
+        showToast("Wallet Required", "Please connect your wallet first", true);
+        return;
+      }
+      document.getElementById("profileModal").classList.remove("hidden");
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.add("hidden");
+    }
+
+    function saveProfileData() {
+      if (!userAddress) return;
+      const name = document.getElementById("editProfileName").value.trim() || "Investor";
+      const mobile = document.getElementById("editProfileMobile").value.trim() || "N/A";
+
+      const key = `anydex_user_${userAddress.toLowerCase()}`;
+      let data = {};
+      try {
+        data = JSON.parse(localStorage.getItem(key) || "{}");
+      } catch (e) {}
+      data.name = name;
+      data.mobile = mobile;
+      localStorage.setItem(key, JSON.stringify(data));
+
+      document.getElementById("profileDisplayName").innerText = name;
+      document.getElementById("profileDisplayMobile").innerText = mobile;
+
+      closeProfileModal();
+      showToast("Profile Updated", "Investor details saved to local database successfully!");
+    }
+
+    async function refreshUserData() {
+      if (!mainContract || !userAddress) return;
+
+      try {
+        // Query User struct from AnyDexAISingle.sol:AnyDexAIMainPlan
+        const profile = await mainContract.users(userAddress);
+        const adaiBal = await adaiContract.balanceOf(userAddress);
+        const claimableLevel = await mainContract.calculateLevelIncome(userAddress);
+        const is120Active = await mainContract.is120DaysActive(userAddress);
+
+        const activeCap = parseFloat(ethers.formatUnits(profile.activeCapital, 18));
+        const totalInv = parseFloat(ethers.formatUnits(profile.totalCapitalInvested, 18));
+        const pLevel = parseFloat(ethers.formatUnits(claimableLevel, 18));
+        const pendingRemainder = parseFloat(ethers.formatUnits(profile.pendingLevelIncome, 18));
+        const adai = parseFloat(ethers.formatUnits(adaiBal, 18));
+        const currentMonthEarned = parseFloat(ethers.formatUnits(profile.currentMonthEarnings, 18));
+
+        document.getElementById("statActiveCapital").innerText = `$${activeCap.toFixed(2)}`;
+        document.getElementById("statTotalInvested").innerText = `$${totalInv.toFixed(2)}`;
+        document.getElementById("statClaimableUSDT").innerText = `$${(pLevel + pendingRemainder).toFixed(2)}`;
+        document.getElementById("cardPendingLevel").innerText = `$${pLevel.toFixed(2)}`;
+        document.getElementById("cardRemainderLevel").innerText = `$${pendingRemainder.toFixed(2)}`;
+        document.getElementById("pendingRemainderAmount").innerText = `$${pendingRemainder.toFixed(2)}`;
+        document.getElementById("statAdaiBalance").innerText = adai.toFixed(2);
+        document.getElementById("cardCurrentMonthAffiliate").innerText = `$${currentMonthEarned.toFixed(2)}`;
+
+        // Update Registration Profile UI
+        if (profile.isRegistered) {
+          document.getElementById("registrationFields").classList.add("hidden");
+          document.getElementById("profileStatusBadge").className = "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+          document.getElementById("profileStatusBadge").innerText = "Registered Member";
+
+          const sponsorStr = profile.sponsor === ethers.ZeroAddress ? "Genesis (Owner)" : `${profile.sponsor.slice(0, 6)}...${profile.sponsor.slice(-4)}`;
+          document.getElementById("profileDisplaySponsor").innerText = sponsorStr;
+          document.getElementById("profileDisplayRegistered").innerText = "Active";
+        } else {
+          document.getElementById("registrationFields").classList.remove("hidden");
+        }
+
+        // 120-Day Activity Countdown
+        const lastRefTime = Number(profile.lastReferralTimestamp);
+        const now = Math.floor(Date.now() / 1000);
+        const deadline = lastRefTime + (120 * 86400);
+
+        if (lastRefTime === 0) {
+          document.getElementById("badge120Day").className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30";
+          document.getElementById("badge120Day").innerText = "Pending 1st Referral";
+          document.getElementById("countdown120Day").innerText = "No referrals yet";
+        } else if (now <= deadline) {
+          const diffSeconds = deadline - now;
+          const days = Math.floor(diffSeconds / 86400);
+          const hours = Math.floor((diffSeconds % 86400) / 3600);
+          document.getElementById("badge120Day").className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+          document.getElementById("badge120Day").innerText = "Active";
+          document.getElementById("countdown120Day").innerText = `${days} Days, ${hours} Hours remaining`;
+        } else {
+          document.getElementById("badge120Day").className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30";
+          document.getElementById("badge120Day").innerText = "Expired (Locked)";
+          document.getElementById("countdown120Day").innerText = "Refer 1 member to reactivate";
+        }
+
+        // 2x Monthly Ceiling Tracker
+        const maxAffiliate = activeCap * 2;
+        document.getElementById("ceilingMonthlyRatio").innerText = `$${currentMonthEarned.toFixed(2)} / $${maxAffiliate.toFixed(2)}`;
+        const percent = maxAffiliate > 0 ? Math.min(100, (currentMonthEarned / maxAffiliate) * 100) : 0;
+        document.getElementById("ceilingProgressBar").style.width = `${percent}%`;
+
+        // Fetch User Investments & Calculate Total Accrued ROI
+        const invCount = Number(await mainContract.getUserInvestmentsCount(userAddress));
+        document.getElementById("userStakesCount").innerText = invCount;
+
+        let totalAccruedRoi = 0;
+        let totalClaimedRoi = 0;
+        const stakesList = [];
+
+        for (let i = 0; i < invCount; i++) {
+          const [inv, claimable] = await Promise.all([
+            mainContract.getUserInvestment(userAddress, i),
+            mainContract.calculateClaimableRoi(userAddress, i)
+          ]);
+          const cap = parseFloat(ethers.formatUnits(inv.capital, 18));
+          const claimed = parseFloat(ethers.formatUnits(inv.totalRoiClaimed, 18));
+          const accrued = parseFloat(ethers.formatUnits(claimable, 18));
+          const roiBps = Number(inv.roiBasisPoints);
+          const duration = Number(inv.durationDays);
+
+          totalAccruedRoi += accrued;
+          totalClaimedRoi += claimed;
+
+          stakesList.push({
+            index: i,
+            capital: cap,
+            claimed: claimed,
+            accrued: accrued,
+            maxRoi: cap * 2,
+            roiPct: (roiBps / 100).toFixed(1),
+            duration: duration,
+            completed: inv.completed
+          });
+        }
+
+        document.getElementById("statPendingROI").innerText = `$${totalAccruedRoi.toFixed(2)}`;
+        document.getElementById("statRoiClaimed").innerText = `$${totalClaimedRoi.toFixed(2)}`;
+        renderStakesTable(stakesList);
+
+        // Fetch NFT Grades
+        const hasEntryPass = await nftContract.hasEntryPass(userAddress);
+        const highestGrade = Number(await nftContract.userHighestGrade(userAddress));
+        document.getElementById("userHighestGradeText").innerText = highestGrade > 0 ? NFT_TIERS[highestGrade]?.name || `Grade #${highestGrade}` : (hasEntryPass ? "Entry Pass" : "None");
+
+        const ownedNFTs = [];
+        if (hasEntryPass) ownedNFTs.push(0);
+        for (let g = 1; g <= 8; g++) {
+          const has = await nftContract.hasGrade(userAddress, g);
+          if (has) ownedNFTs.push(g);
+        }
+        document.getElementById("userNftCount").innerText = ownedNFTs.length;
+        renderNftGrid(ownedNFTs, highestGrade);
+
+        // Downline Volume & Member Breakdown (Levels 1 to 5)
+        const counts = [];
+        const volumes = [];
+        let totalVol = 0;
+        for (let lvl = 1; lvl <= 5; lvl++) {
+          const [c, v] = await Promise.all([
+            mainContract.userDownlineCount(userAddress, lvl),
+            mainContract.userDownlineVolume(userAddress, lvl)
+          ]);
+          const mCount = Number(c);
+          const mVol = parseFloat(ethers.formatUnits(v, 18));
+          counts.push(mCount);
+          volumes.push(mVol);
+          totalVol += mVol;
+        }
+
+        document.getElementById("statDirectCount").innerText = counts[0] || 0;
+        document.getElementById("statTeamVolume").innerText = `$${totalVol.toFixed(2)}`;
+        renderLevelTable(counts, volumes);
+
+      } catch (err) {
+        console.error("Error refreshing user data:", err);
+      }
+    }
+
+    function renderStakesTable(stakes) {
+      const tbody = document.getElementById("stakesTableBody");
+      tbody.innerHTML = "";
+
+      if (stakes.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-6 text-center text-slate-500 font-sans">
+              No active stakes found. Choose a package above to begin earning ROI.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      stakes.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/30 transition";
+        tr.innerHTML = `
+          <td class="py-3 font-bold text-white">#${s.index + 1}</td>
+          <td class="py-3 text-emerald-400 font-bold">$${s.capital.toLocaleString()}</td>
+          <td class="py-3 text-slate-300">${s.roiPct}% / ${s.duration}d</td>
+          <td class="py-3 text-slate-300">$${s.claimed.toFixed(2)} / $${s.maxRoi.toFixed(2)}</td>
+          <td class="py-3 text-cyan-400 font-bold">$${s.accrued.toFixed(2)}</td>
+          <td class="py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              s.completed ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "bg-emerald-500/20 text-emerald-400"
+            }">
+              ${s.completed ? "COMPLETED (200%)" : "ACCRUING"}
+            </span>
+          </td>
+          <td class="py-3 text-right">
+            ${
+              s.completed
+                ? `<span class="text-xs text-slate-500 font-sans">ADAI Refunded</span>`
+                : `<button onclick="claimSingleRoi(${s.index})" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shadow">
+                    Claim ROI
+                   </button>`
+            }
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderNftGrid(ownedNFTs, highestGrade) {
+      const container = document.getElementById("nftContainer");
+      container.innerHTML = "";
+
+      NFT_TIERS.forEach(nft => {
+        const isOwned = ownedNFTs.includes(nft.id);
+        const card = document.createElement("div");
+        card.className = `p-4 rounded-2xl border text-center transition flex flex-col justify-between ${
+          isOwned ? "nft-badge-active bg-slate-900 border-gold" : "nft-badge-locked bg-slate-950 border-slate-800"
+        }`;
+        card.innerHTML = `
+          <div>
+            <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-xl mb-2 ${
+              isOwned ? "bg-gold/20 text-gold shadow-lg shadow-gold/20" : "bg-slate-800 text-slate-500"
+            }">
+              <i class="fa-solid ${nft.icon}"></i>
+            </div>
+            <div class="font-bold text-xs ${isOwned ? "text-white" : "text-slate-400"}">${nft.name}</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">${nft.req}</div>
+          </div>
+          <div class="mt-3">
+            ${
+              isOwned
+                ? `<span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-gold/20 text-gold border border-gold/30">OWNED</span>`
+                : (nft.id > 0
+                    ? `<button onclick="claimRoyalGrade(${nft.id})" class="w-full py-1 text-[10px] font-bold rounded bg-slate-800 hover:bg-gold/20 hover:text-gold text-slate-400 border border-slate-700 transition">Claim</button>`
+                    : `<span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-500">LOCKED</span>`)
+            }
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderLevelTable(counts, volumes) {
+      const tbody = document.getElementById("levelTableBody");
+      tbody.innerHTML = "";
+
+      LEVEL_REQUIREMENTS.forEach((req, idx) => {
+        const count = counts[idx] || 0;
+        const vol = volumes[idx] || 0;
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/30 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 font-bold text-white">Level ${req.level}</td>
+          <td class="py-2.5 text-emerald-400 font-bold">${req.roi}</td>
+          <td class="py-2.5 text-slate-400">${req.req}</td>
+          <td class="py-2.5 text-slate-200">${count} users</td>
+          <td class="py-2.5 text-slate-200">$${vol.toFixed(2)}</td>
+          <td class="py-2.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              count > 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-500"
+            }">
+              ${count > 0 ? "QUALIFIED" : "PENDING"}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Modal & Transaction Handlers
+    function handleInvestModal(packId, price) {
+      if (!userAddress) {
+        showToast("Connect Wallet", "Please connect your wallet first", true);
+        return;
+      }
+      activePackageId = packId;
+      activePackagePrice = price;
+      document.getElementById("modalPackageName").innerText = `Package #${packId} ($${price.toLocaleString()} USDT)`;
+      document.getElementById("investModal").classList.remove("hidden");
+    }
+
+    function closeInvestModal() {
+      document.getElementById("investModal").classList.add("hidden");
+    }
+
+    async function approveUSDT() {
+      try {
+        const amountWei = ethers.parseUnits(activePackagePrice.toString(), 18);
+        const mainAddress = await mainContract.getAddress();
+        showToast("Submitting Approval", "Please confirm USDT approval in your wallet...");
+        const tx = await usdtContract.approve(mainAddress, amountWei);
+        await tx.wait();
+        showToast("Approved", "USDT approved successfully! Proceed to Step 2.");
+        document.getElementById("btnApproveUsdt").className = "w-full bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 py-3 rounded-xl font-bold text-xs";
+        document.getElementById("btnApproveUsdt").innerText = "✓ USDT Approved";
+      } catch (err) {
+        console.error(err);
+        showToast("Approval Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function executeInvest() {
+      try {
+        const name = document.getElementById("regName").value.trim() || "Investor";
+        const mobile = document.getElementById("regMobile").value.trim() || "N/A";
+        let sponsor = document.getElementById("regSponsor").value.trim();
+
+        // If sponsor is empty or invalid, fallback to contract owner
+        if (!sponsor || !ethers.isAddress(sponsor)) {
+          sponsor = await mainContract.owner();
+        }
+
+        showToast("Staking", "Confirming investment in AnyDexAISingle smart contract...");
+
+        // Call registerAndInvest(sponsor, packageId) from AnyDexAISingle.sol
+        const tx = await mainContract.registerAndInvest(sponsor, activePackageId);
+        await tx.wait();
+
+        // Save investor details to local DB
+        localStorage.setItem(`anydex_user_${userAddress.toLowerCase()}`, JSON.stringify({
+          name: name,
+          mobile: mobile,
+          sponsor: sponsor,
+          registeredAt: new Date().toISOString()
+        }));
+        loadLocalProfile();
+
+        showToast("Investment Successful!", `Staked $${activePackagePrice.toLocaleString()} USDT & received welcome Entry Pass NFT + ADAI!`);
+        closeInvestModal();
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Investment Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function claimSingleRoi(invIndex) {
+      try {
+        showToast("Claiming ROI", `Harvesting ROI for stake #${invIndex + 1}...`);
+        const tx = await mainContract.claimRoi(invIndex);
+        await tx.wait();
+        showToast("ROI Harvested", `ROI for stake #${invIndex + 1} transferred to your wallet!`);
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Claim Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function claimLevelIncome() {
+      try {
+        showToast("Claiming Level Income", "Processing 5-tier level income withdrawal...");
+        const tx = await mainContract.withdrawLevelIncome();
+        await tx.wait();
+        showToast("Withdrawn!", "Level income sent directly to your USDT wallet!");
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Withdrawal Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function claimRoyalGrade(gradeId) {
+      try {
+        showToast("Claiming NFT Grade", `Verifying qualification for Royal Grade #${gradeId}...`);
+        const tx = await mainContract.claimNFTGrade(gradeId);
+        await tx.wait();
+        showToast("NFT Minted!", `Royal Grade #${gradeId} minted to your wallet!`);
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Grade Claim Failed", err.reason || err.message, true);
+      }
+    }
+
+    // Admin Control Actions
+    async function adminUpdatePackage() {
+      try {
+        const pkgId = Number(document.getElementById("adminPkgId").value);
+        const roiBps = Number(document.getElementById("adminPkgRoiBps").value);
+        const duration = Number(document.getElementById("adminPkgDuration").value);
+
+        showToast("Admin Action", `Updating package #${pkgId} ROI & duration...`);
+        const tx = await mainContract.updatePackageRoiAndDuration(pkgId, roiBps, duration);
+        await tx.wait();
+        showToast("Package Updated", `Package #${pkgId} successfully updated in smart contract!`);
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Admin Action Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function adminAddNewPackage() {
+      try {
+        const amount = ethers.parseUnits(document.getElementById("adminNewAmount").value, 18);
+        const roiBps = Number(document.getElementById("adminNewRoiBps").value);
+        const duration = Number(document.getElementById("adminNewDuration").value);
+        const reward = ethers.parseUnits(document.getElementById("adminNewTokenReward").value, 18);
+
+        showToast("Admin Action", "Adding new investment package to smart contract...");
+        const tx = await mainContract.addPackage(amount, roiBps, duration, reward);
+        await tx.wait();
+        showToast("Package Created", "New package added to smart contract!");
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Admin Action Failed", err.reason || err.message, true);
+      }
+    }
+
+    async function adminWithdrawTreasury() {
+      try {
+        const amountVal = document.getElementById("adminWithdrawAmount").value;
+        const recipient = document.getElementById("adminWithdrawRecipient").value;
+        if (!amountVal || !recipient || !ethers.isAddress(recipient)) {
+          showToast("Invalid Input", "Please provide a valid amount and recipient address", true);
+          return;
+        }
+
+        const amountWei = ethers.parseUnits(amountVal, 18);
+        showToast("Admin Action", `Withdrawing ${amountVal} USDT from contract treasury...`);
+        const tx = await mainContract.adminWithdrawUSDT(amountWei, recipient);
+        await tx.wait();
+        showToast("Treasury Withdrawn", `${amountVal} USDT transferred to ${recipient.slice(0, 6)}...`);
+        await refreshUserData();
+      } catch (err) {
+        console.error(err);
+        showToast("Admin Action Failed", err.reason || err.message, true);
+      }
+    }
+
+    function copyRefLink() {
+      const text = document.getElementById("refLinkText").innerText;
+      if (text.startsWith("http")) {
+        navigator.clipboard.writeText(text);
+        showToast("Copied", "Affiliate link copied to clipboard!");
+      } else {
+        showToast("Wallet required", "Please connect your wallet first", true);
+      }
+    }
+
+    function showToast(title, message, isError = false) {
+      const toast = document.getElementById("toast");
+      const icon = document.getElementById("toastIcon");
+      document.getElementById("toastTitle").innerText = title;
+      document.getElementById("toastMessage").innerText = message;
+
+      if (isError) {
+        icon.className = "text-red-400 text-lg mt-0.5";
+        icon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 max-w-sm bg-slate-900 border border-red-500/50 shadow-2xl rounded-2xl p-4 flex items-start space-x-3";
+      } else {
+        icon.className = "text-emerald-400 text-lg mt-0.5";
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 max-w-sm bg-slate-900 border border-emerald-500/50 shadow-2xl rounded-2xl p-4 flex items-start space-x-3";
+      }
+
+      setTimeout(() => {
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm bg-slate-900 border border-emerald-500/50 shadow-2xl rounded-2xl p-4 flex items-start space-x-3";
+      }, 4500);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAIMain.sol": {
+      "lastModificationDate": 1790193396852,
+      "contentHash": "c77822efec91f6d9450f6bc6847b6bdd",
+      "sourceName": "contracts/AnyDexAIMain.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IERC20.sol",
+        "./utils/SafeERC20.sol",
+        "./utils/Ownable.sol",
+        "./utils/ReentrancyGuard.sol",
+        "./tokens/ADAI.sol",
+        "./tokens/AnyDexAINFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "AnyDexAIMain"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1790193396857,
+      "contentHash": "416ba89cd3a3f557a9360a47e2a88570",
+      "sourceName": "contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/utils/Ownable.sol": {
+      "lastModificationDate": 1790193396859,
+      "contentHash": "0c995b1b987f4933c7fdc2086fad588a",
+      "sourceName": "contracts/utils/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/utils/SafeERC20.sol": {
+      "lastModificationDate": 1790193396860,
+      "contentHash": "76350afb42c40ac824aa087a381ff50f",
+      "sourceName": "contracts/utils/SafeERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "SafeERC20"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/utils/ReentrancyGuard.sol": {
+      "lastModificationDate": 1790193396859,
+      "contentHash": "51ca65a320275563ecc0934b127e1152",
+      "sourceName": "contracts/utils/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "ReentrancyGuard"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/tokens/ADAI.sol": {
+      "lastModificationDate": 1790193396858,
+      "contentHash": "349f7d29691446ad6b99307f248ff20c",
+      "sourceName": "contracts/tokens/ADAI.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol",
+        "../utils/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "ADAI"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/tokens/AnyDexAINFT.sol": {
+      "lastModificationDate": 1790193396858,
+      "contentHash": "d5946f92742e6ee70a127c11e5a698ea",
+      "sourceName": "contracts/tokens/AnyDexAINFT.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "AnyDexAINFT",
+        "IERC721Receiver"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/tokens/MockUSDT.sol": {
+      "lastModificationDate": 1790193396859,
+      "contentHash": "3bbebec9fed3d4d41912742f7ac68455",
+      "sourceName": "contracts/tokens/MockUSDT.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "MockUSDT"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/ADAIToken.sol": {
+      "lastModificationDate": 1790192386706,
+      "contentHash": "e0ddbc4e4a6443b27c1d65b7b978899b",
+      "sourceName": "contracts/ADAIToken.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./common/IERC20.sol",
+        "./common/Ownable.sol",
+        "./interfaces/IADAIToken.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "ADAIToken"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/IERC20.sol": {
+      "lastModificationDate": 1790192359503,
+      "contentHash": "df9216171a56f7bf2bdb778e5808d3ab",
+      "sourceName": "contracts/common/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/interfaces/IADAIToken.sol": {
+      "lastModificationDate": 1790192377082,
+      "contentHash": "a609063b2affd406b0a5d9dd9c752e14",
+      "sourceName": "contracts/interfaces/IADAIToken.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../common/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "IADAIToken"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/Ownable.sol": {
+      "lastModificationDate": 1790192369429,
+      "contentHash": "55292c0124a1fbabec436bab110c93fa",
+      "sourceName": "contracts/common/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAINFT.sol": {
+      "lastModificationDate": 1790194067636,
+      "contentHash": "5c3917e963f36623119f7d982f759355",
+      "sourceName": "contracts/AnyDexAINFT.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./common/Ownable.sol",
+        "./interfaces/IAnyDexAINFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "AnyDexAINFT",
+        "IERC721Receiver"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/interfaces/IAnyDexAINFT.sol": {
+      "lastModificationDate": 1790192380085,
+      "contentHash": "856513c633a882943e75e1cb215214ea",
+      "sourceName": "contracts/interfaces/IAnyDexAINFT.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "IAnyDexAINFT"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAIMainPlan.sol": {
+      "lastModificationDate": 1790194055479,
+      "contentHash": "10a08c040f1ee4f9562064deed9e4b31",
+      "sourceName": "contracts/AnyDexAIMainPlan.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./common/IERC20.sol",
+        "./common/SafeERC20.sol",
+        "./common/Ownable.sol",
+        "./common/ReentrancyGuard.sol",
+        "./interfaces/IADAIToken.sol",
+        "./interfaces/IAnyDexAINFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "AnyDexAIMainPlan"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/SafeERC20.sol": {
+      "lastModificationDate": 1790192364350,
+      "contentHash": "9d2a3915bb6fd27296f484807027b094",
+      "sourceName": "contracts/common/SafeERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "SafeERC20"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/ReentrancyGuard.sol": {
+      "lastModificationDate": 1790192372946,
+      "contentHash": "52dc3d2f64eec2e1e3dc144064f6e24f",
+      "sourceName": "contracts/common/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "ReentrancyGuard"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAISingle.sol": {
+      "lastModificationDate": 1790194092553,
+      "contentHash": "ed76a1e11b326b0dad93276cebf55ae7",
+      "sourceName": "contracts/AnyDexAISingle.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "ADAIToken",
+        "AnyDexAIMainPlan",
+        "AnyDexAINFT",
+        "IADAIToken",
+        "IAnyDexAINFT",
+        "IERC20",
+        "IERC721Receiver",
+        "Ownable",
+        "ReentrancyGuard",
+        "SafeERC20"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/test/MockFailureTokens.sol": {
+      "lastModificationDate": 1790196151686,
+      "contentHash": "7aeb5fec35601b876df7631e2132efd1",
+      "sourceName": "contracts/test/MockFailureTokens.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../common/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "FalseReturnToken",
+        "MaliciousReentrantToken",
+        "NoReturnToken",
+        "RevertingToken"
+      ]
+    },
+    "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/test/ReentrancyAttacker.sol": {
+      "lastModificationDate": 1790195242955,
+      "contentHash": "72f0f3669530ea180bbcd9267bdcbd2e",
+      "sourceName": "contracts/test/ReentrancyAttacker.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "IAnyDexAIMainPlanAttack",
+        "ReentrancyAttacker"
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+0 verbose cli /opt/homebrew/Cellar/node/26.5.0/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.17.0
+2 info using node@v26.5.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npmrc
+5 silly config load:file:/opt/homebrew/etc/npmrc
+6 verbose title npm exec hardhat test test/19_Integration.test.js
+7 verbose argv "exec" "--" "hardhat" "test" "test/19_Integration.test.js"
+8 verbose logfile logs-max:10 dir:/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npm/_logs/2026-09-23T20_38_13_829Z-
+9 verbose logfile /Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/.npm/_logs/2026-09-23T20_38_13_829Z-debug-0.log
+10 silly logfile start cleaning logs, removing 1 files
+11 silly logfile done cleaning log files
+12 verbose cwd /Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts
+13 verbose os Darwin 24.6.0
+14 verbose node v26.5.0
+15 verbose npm  v11.17.0
+16 verbose exit 1
+17 verbose code 1
