@@ -12,6 +12,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -55,6 +56,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -91,6 +93,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -127,6 +130,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -165,6 +169,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -201,6 +206,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -240,6 +246,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -279,6 +286,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -307,7 +315,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/ADAIToken.sol": {
-      "lastModificationDate": 1790192386706,
+      "lastModificationDate": 1790193396851,
       "contentHash": "e0ddbc4e4a6443b27c1d65b7b978899b",
       "sourceName": "contracts/ADAIToken.sol",
       "solcConfig": {
@@ -317,6 +325,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -347,7 +356,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/IERC20.sol": {
-      "lastModificationDate": 1790192359503,
+      "lastModificationDate": 1790193396855,
       "contentHash": "df9216171a56f7bf2bdb778e5808d3ab",
       "sourceName": "contracts/common/IERC20.sol",
       "solcConfig": {
@@ -357,6 +366,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -383,7 +393,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/interfaces/IADAIToken.sol": {
-      "lastModificationDate": 1790192377082,
+      "lastModificationDate": 1790193396856,
       "contentHash": "a609063b2affd406b0a5d9dd9c752e14",
       "sourceName": "contracts/interfaces/IADAIToken.sol",
       "solcConfig": {
@@ -393,6 +403,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -421,7 +432,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/Ownable.sol": {
-      "lastModificationDate": 1790192369429,
+      "lastModificationDate": 1790193396855,
       "contentHash": "55292c0124a1fbabec436bab110c93fa",
       "sourceName": "contracts/common/Ownable.sol",
       "solcConfig": {
@@ -431,6 +442,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -457,8 +469,8 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAINFT.sol": {
-      "lastModificationDate": 1790194067636,
-      "contentHash": "5c3917e963f36623119f7d982f759355",
+      "lastModificationDate": 1790204529797,
+      "contentHash": "02fb4a406ca65f63a928c5de661223ed",
       "sourceName": "contracts/AnyDexAINFT.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -467,6 +479,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -497,8 +510,8 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/interfaces/IAnyDexAINFT.sol": {
-      "lastModificationDate": 1790192380085,
-      "contentHash": "856513c633a882943e75e1cb215214ea",
+      "lastModificationDate": 1790204523123,
+      "contentHash": "fd52dbf0ddbcf2f110bcca2aa7f9e206",
       "sourceName": "contracts/interfaces/IAnyDexAINFT.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -507,6 +520,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -533,8 +547,8 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAIMainPlan.sol": {
-      "lastModificationDate": 1790194055479,
-      "contentHash": "10a08c040f1ee4f9562064deed9e4b31",
+      "lastModificationDate": 1790204909523,
+      "contentHash": "94783dbde4cf1f8ecd5336c8999c9a2b",
       "sourceName": "contracts/AnyDexAIMainPlan.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -543,6 +557,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -576,7 +591,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/SafeERC20.sol": {
-      "lastModificationDate": 1790192364350,
+      "lastModificationDate": 1790193396856,
       "contentHash": "9d2a3915bb6fd27296f484807027b094",
       "sourceName": "contracts/common/SafeERC20.sol",
       "solcConfig": {
@@ -586,6 +601,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -614,7 +630,7 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/common/ReentrancyGuard.sol": {
-      "lastModificationDate": 1790192372946,
+      "lastModificationDate": 1790193396855,
       "contentHash": "52dc3d2f64eec2e1e3dc144064f6e24f",
       "sourceName": "contracts/common/ReentrancyGuard.sol",
       "solcConfig": {
@@ -624,6 +640,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -650,8 +667,8 @@
       ]
     },
     "/Users/jagadeesan/.gemini/antigravity/scratch/anydexai-contracts/contracts/AnyDexAISingle.sol": {
-      "lastModificationDate": 1790194092553,
-      "contentHash": "ed76a1e11b326b0dad93276cebf55ae7",
+      "lastModificationDate": 1790204957801,
+      "contentHash": "624eb9f9fa3792097db1e781fb1468e1",
       "sourceName": "contracts/AnyDexAISingle.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -660,6 +677,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -705,6 +723,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -746,6 +765,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {

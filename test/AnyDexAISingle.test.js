@@ -98,6 +98,48 @@ describe("AnyDexAISingle.sol - Comprehensive Production & Load Test Suite", func
       expect(await mainPlan.directReferralL2Bps()).to.equal(200n);
       expect(await mainPlan.directReferralL3Bps()).to.equal(100n);
     });
+
+    it("Should verify deployer is owner, root user registered in constructor, and owner has maximum levels unlocked defaultly", async function () {
+      expect(await mainPlan.owner()).to.equal(owner.address);
+      const ownerUser = await mainPlan.users(owner.address);
+      expect(ownerUser.isRegistered).to.be.true;
+      expect(ownerUser.sponsor).to.equal(ethers.ZeroAddress);
+      expect(await mainPlan.is120DaysActive(owner.address)).to.be.true;
+
+      // Owner must have maximum levels (Levels 1 to 5) unlocked by default
+      for (let lvl = 1; lvl <= 5; lvl++) {
+        expect(await mainPlan.isLevelEligible(owner.address, lvl)).to.be.true;
+      }
+
+      // User ID verification
+      expect(await mainPlan.totalUsers()).to.equal(1n);
+      expect(await mainPlan.idToAddress(1)).to.equal(owner.address);
+      expect(await mainPlan.addressToId(owner.address)).to.equal(1n);
+      expect(await mainPlan.getUserAddress(1)).to.equal(owner.address);
+      expect(await mainPlan.getUserId(owner.address)).to.equal(1n);
+      expect(ownerUser.id).to.equal(1n);
+
+      // Non-owner should not be eligible without meeting criteria
+      expect(await mainPlan.isLevelEligible(testUsers[0].address, 1)).to.be.false;
+      expect(await mainPlan.is120DaysActive(testUsers[0].address)).to.be.false;
+    });
+
+    it("Should allow registration using sponsor User ID via registerAndInvestWithId", async function () {
+      const uIdUser = testUsers[9];
+      await usdt.mint(uIdUser.address, toWei(1000));
+      await usdt.connect(uIdUser).approve(await mainPlan.getAddress(), toWei(1000));
+
+      // Register under Owner (User ID 1) using registerAndInvestWithId
+      await mainPlan.connect(uIdUser).registerAndInvestWithId(1, 1);
+
+      expect(await mainPlan.totalUsers()).to.be.gte(2n);
+      const assignedId = await mainPlan.addressToId(uIdUser.address);
+      expect(assignedId).to.be.gte(2n);
+      expect(await mainPlan.idToAddress(assignedId)).to.equal(uIdUser.address);
+      const uData = await mainPlan.users(uIdUser.address);
+      expect(uData.sponsor).to.equal(owner.address);
+      expect(uData.id).to.equal(assignedId);
+    });
   });
 
   // ============================================================================

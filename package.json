@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "AnyDexAI Smart Contracts",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "dev": "node frontend/server.js",
+    "start": "node frontend/server.js",
+    "export-frontend": "node scripts/export-frontend.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",

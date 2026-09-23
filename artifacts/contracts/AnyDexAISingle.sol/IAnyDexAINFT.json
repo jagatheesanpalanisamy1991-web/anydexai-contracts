@@ -75,11 +75,59 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "tier",
+          "type": "uint8"
+        }
+      ],
+      "name": "hasTierNFT",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "to",
           "type": "address"
         }
       ],
       "name": "mintEntryPass",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "tier",
+          "type": "uint8"
+        }
+      ],
+      "name": "mintGradeNFT",
       "outputs": [
         {
           "internalType": "uint256",

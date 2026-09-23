@@ -20,6 +20,9 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // --- Custom Errors for Gas Optimization & Audit Clarity ---
+    error AlreadyRegistered();
+    error NotRegistered();
+    error InvalidReferrerID();
     error InvalidPackage();
     error PackageInactive();
     error InvalidSponsor();
@@ -114,8 +117,12 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
 
     // --- User Profile Struct ---
     struct User {
+        bool isExist;                 // True if account exists in genealogy tree
+        uint256 id;
         bool isRegistered;
         address sponsor;
+        uint256 referrerID;           // Direct tree parent / referrer ID
+        uint256 sponsorID;            // Direct inviter ID
         uint256 activeCapital;
         uint256 totalCapitalInvested;
         uint256 lastReferralTimestamp;
@@ -128,7 +135,14 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
         uint256 directCount;
         uint256 level1Business;
         uint256 totalTeamBusiness;
+        address[] referrals;          // Direct children referrals list
     }
+
+    uint256 public totalUsers;
+    uint256 public currentId;         // Sequential user counter (alias for totalUsers)
+    mapping(uint256 => address) public idToAddress;
+    mapping(uint256 => address) public userList; // Mapping from User ID to address
+    mapping(address => uint256) public addressToId;
 
     mapping(address => User) public users;
     mapping(address => Investment[]) public userInvestments;
@@ -188,6 +202,29 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
         nftGradeConfigs[6] = NFTGradeCriteria(6, 729, 1215000 * 1e18);  // Alpha Duke
         nftGradeConfigs[7] = NFTGradeCriteria(7, 2187, 3645000 * 1e18); // Royal Archon
         nftGradeConfigs[8] = NFTGradeCriteria(8, 6561, 10935000 * 1e18);// AnyDex Sovereign
+
+        // Root Deployer / Owner User Registration with default maximum levels (User ID 1)
+        address rootOwner = initialOwner != address(0) ? initialOwner : msg.sender;
+        totalUsers = 1;
+        currentId = 1;
+        idToAddress[1] = rootOwner;
+        userList[1] = rootOwner;
+        addressToId[rootOwner] = 1;
+        users[rootOwner].isExist = true;
+        users[rootOwner].id = 1;
+        users[rootOwner].isRegistered = true;
+        users[rootOwner].lastReferralTimestamp = block.timestamp;
+        users[rootOwner].currentMonthStartTime = block.timestamp;
+        users[rootOwner].lastLevelAccrualTime = block.timestamp;
+        emit Registered(rootOwner, address(0), 1, block.timestamp);
+    }
+
+    function getUserAddress(uint256 userId) external view returns (address) {
+        return idToAddress[userId];
+    }
+
+    function getUserId(address userAddr) external view returns (uint256) {
+        return addressToId[userAddr];
     }
 
     // --- External Setters for Tokens ---
@@ -203,43 +240,134 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
         emit AdaiRefundRateUpdated(newRate);
     }
 
-    // --- Investment & Registration ---
+    // --- User Registration & Package Investment Functions ---
+
+    /**
+     * @notice Registers a new user account with a numeric referrer ID
+     * @param _referrerID The numeric ID of the sponsor (e.g. 1 for Root Owner)
+     */
+    function regUser(uint256 _referrerID) public nonReentrant {
+        if (users[msg.sender].isRegistered || users[msg.sender].isExist) revert AlreadyRegistered();
+        if (_referrerID == 0 || _referrerID > totalUsers) revert InvalidReferrerID();
+
+        address sponsorAddr = idToAddress[_referrerID];
+        if (sponsorAddr == address(0) || sponsorAddr == msg.sender) revert InvalidSponsor();
+        if (!users[sponsorAddr].isRegistered && sponsorAddr != owner()) revert SponsorNotActive();
+
+        _registerUserInternal(msg.sender, sponsorAddr, _referrerID, 0);
+    }
+
+    /**
+     * @notice Registers a new user account with a referrer address
+     * @param _referrer The wallet address of the sponsor
+     */
+    function regUser(address _referrer) public nonReentrant {
+        if (users[msg.sender].isRegistered || users[msg.sender].isExist) revert AlreadyRegistered();
+        if (_referrer == address(0) || _referrer == msg.sender) revert InvalidSponsor();
+        if (!users[_referrer].isRegistered && _referrer != owner()) revert SponsorNotActive();
+
+        uint256 sponsorId = addressToId[_referrer];
+        _registerUserInternal(msg.sender, _referrer, sponsorId, 0);
+    }
+
+    /**
+     * @notice Registers a new user with a referrer ID and immediately purchases an investment package
+     * @param _referrerID The numeric ID of the sponsor
+     * @param _packageId The package ID to purchase with USDT
+     */
+    function regUser(uint256 _referrerID, uint256 _packageId) external nonReentrant {
+        if (!users[msg.sender].isRegistered && !users[msg.sender].isExist) {
+            if (_referrerID == 0 || _referrerID > totalUsers) revert InvalidReferrerID();
+            address sponsorAddr = idToAddress[_referrerID];
+            if (sponsorAddr == address(0) || sponsorAddr == msg.sender) revert InvalidSponsor();
+            if (!users[sponsorAddr].isRegistered && sponsorAddr != owner()) revert SponsorNotActive();
+            _registerUserInternal(msg.sender, sponsorAddr, _referrerID, _packageId);
+        }
+        _investInternal(msg.sender, _packageId);
+    }
+
+    /**
+     * @notice Purchase an investment package for an already registered user
+     * @param packageId ID of the package to purchase
+     */
+    function buyPackage(uint256 packageId) external nonReentrant {
+        if (!users[msg.sender].isRegistered) revert NotRegistered();
+        _investInternal(msg.sender, packageId);
+    }
+
+    /**
+     * @notice Invest in an AnyDexAI package for an already registered user
+     * @param packageId ID of the package to purchase
+     */
+    function invest(uint256 packageId) external nonReentrant {
+        if (!users[msg.sender].isRegistered) revert NotRegistered();
+        _investInternal(msg.sender, packageId);
+    }
+
+    function registerAndInvestWithId(uint256 sponsorId, uint256 packageId) external nonReentrant {
+        address sponsor = idToAddress[sponsorId];
+        if (sponsor == address(0)) revert InvalidSponsor();
+        _registerAndInvestInternal(sponsor, packageId);
+    }
 
     /**
      * @notice Register and invest in an AnyDexAI package
      * @param sponsor Address of the referrer
      * @param packageId ID of the package to purchase
      */
-    function registerAndInvest(address sponsor, uint256 packageId) external nonReentrant {
+    function registerAndInvest(address sponsor, uint256 packageId) public nonReentrant {
+        _registerAndInvestInternal(sponsor, packageId);
+    }
+
+    function _registerAndInvestInternal(address sponsor, uint256 packageId) internal {
+        if (!users[msg.sender].isRegistered) {
+            if (sponsor == address(0) || sponsor == msg.sender) revert InvalidSponsor();
+            if (!users[sponsor].isRegistered && sponsor != owner()) revert SponsorNotActive();
+            uint256 sId = addressToId[sponsor];
+            _registerUserInternal(msg.sender, sponsor, sId, packageId);
+        }
+        _investInternal(msg.sender, packageId);
+    }
+
+    function _registerUserInternal(address userAddr, address sponsorAddr, uint256 sponsorId, uint256 packageId) internal {
+        totalUsers += 1;
+        currentId = totalUsers;
+        uint256 newUserId = totalUsers;
+
+        idToAddress[newUserId] = userAddr;
+        userList[newUserId] = userAddr;
+        addressToId[userAddr] = newUserId;
+
+        User storage user = users[userAddr];
+        user.isExist = true;
+        user.id = newUserId;
+        user.isRegistered = true;
+        user.sponsor = sponsorAddr;
+        user.referrerID = sponsorId;
+        user.sponsorID = sponsorId;
+        user.lastReferralTimestamp = block.timestamp;
+        user.currentMonthStartTime = block.timestamp;
+        user.lastLevelAccrualTime = block.timestamp;
+
+        // Push child into sponsor's direct referrals list
+        users[sponsorAddr].referrals.push(userAddr);
+        users[sponsorAddr].directCount += 1;
+        users[sponsorAddr].lastReferralTimestamp = block.timestamp;
+
+        // Mint Entry Pass NFT (one-time on registration)
+        if (address(nftContract) != address(0)) {
+            nftContract.mintEntryPass(userAddr);
+        }
+
+        emit Registered(userAddr, sponsorAddr, packageId, block.timestamp);
+    }
+
+    function _investInternal(address userAddr, uint256 packageId) internal {
         if (packageId < 1 || packageId > packageCount) revert InvalidPackage();
         Package memory pkg = packages[packageId];
         if (!pkg.isActive) revert PackageInactive();
 
-        address userAddr = msg.sender;
         User storage user = users[userAddr];
-
-        if (!user.isRegistered) {
-            // First time registration
-            if (sponsor == address(0) || sponsor == userAddr) revert InvalidSponsor();
-            if (!users[sponsor].isRegistered && sponsor != owner()) revert SponsorNotActive();
-
-            user.isRegistered = true;
-            user.sponsor = sponsor;
-            user.lastReferralTimestamp = block.timestamp;
-            user.currentMonthStartTime = block.timestamp;
-            user.lastLevelAccrualTime = block.timestamp;
-
-            // Update Sponsor metrics
-            users[sponsor].directCount += 1;
-            users[sponsor].lastReferralTimestamp = block.timestamp;
-
-            // Mint Entry Pass NFT (one-time on registration)
-            if (address(nftContract) != address(0)) {
-                nftContract.mintEntryPass(userAddr);
-            }
-
-            emit Registered(userAddr, sponsor, packageId, block.timestamp);
-        }
 
         // Transfer USDT from user to contract
         usdtToken.safeTransferFrom(userAddr, address(this), pkg.amount);
@@ -254,7 +382,7 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
         user.activeCapital += pkg.amount;
         user.totalCapitalInvested += pkg.amount;
 
-        // CRITICAL PRODUCTION HARDENING: Snapshot economic terms (roiBps, durationDays) in Investment struct!
+        // Snapshot economic terms in Investment struct
         userInvestments[userAddr].push(Investment({
             capital: uint128(pkg.amount),
             totalRoiClaimed: 0,
@@ -429,6 +557,7 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
      */
     function isLevelEligible(address userAddr, uint8 level) public view returns (bool) {
         if (level < 1 || level > 5) return false;
+        if (userAddr == owner()) return true; // Owner defaultly has maximum levels unlocked
         LevelCriteria memory crit = levelConfigs[level];
 
         if (level == 1) {
@@ -452,6 +581,7 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
      * @notice Check 120-day activity rule: must refer at least 1 user within 120 days of previous referral
      */
     function is120DaysActive(address userAddr) public view returns (bool) {
+        if (userAddr == owner()) return true; // Owner is always active by default
         if (!users[userAddr].isRegistered) return false;
         return (block.timestamp - users[userAddr].lastReferralTimestamp <= ACTIVITY_WINDOW_DAYS);
     }
@@ -461,7 +591,8 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
      */
     function calculateLevelIncome(address userAddr) public view returns (uint256) {
         User memory u = users[userAddr];
-        if (u.activeCapital == 0 || block.timestamp <= u.lastLevelAccrualTime) return 0;
+        if (userAddr != owner() && u.activeCapital == 0) return 0;
+        if (block.timestamp <= u.lastLevelAccrualTime) return 0;
 
         uint256 timeElapsed = block.timestamp - u.lastLevelAccrualTime;
         uint256 totalAccrued = 0;
@@ -496,18 +627,20 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
         if (totalClaimable < minWithdrawal) revert BelowMinWithdrawal();
 
         _refreshMonthlyCap(u);
-        uint256 maxMonthly = u.activeCapital * MAX_EARNINGS_MULTIPLIER;
         uint256 payableAmount = totalClaimable;
 
-        if (u.currentMonthEarnings + totalClaimable > maxMonthly) {
-            if (maxMonthly > u.currentMonthEarnings) {
-                payableAmount = maxMonthly - u.currentMonthEarnings;
-            } else {
-                payableAmount = 0;
+        if (userAddr != owner()) {
+            uint256 maxMonthly = u.activeCapital * MAX_EARNINGS_MULTIPLIER;
+            if (u.currentMonthEarnings + totalClaimable > maxMonthly) {
+                if (maxMonthly > u.currentMonthEarnings) {
+                    payableAmount = maxMonthly - u.currentMonthEarnings;
+                } else {
+                    payableAmount = 0;
+                }
             }
-        }
 
-        if (payableAmount == 0) revert ReachedMonthlyCeiling();
+            if (payableAmount == 0) revert ReachedMonthlyCeiling();
+        }
 
         // CRITICAL PRODUCTION HARDENING: Retain unpaid remainder in pendingLevelIncome so it carries forward!
         uint256 unpaidRemainder = totalClaimable - payableAmount;
@@ -649,5 +782,39 @@ contract AnyDexAIMainPlan is Ownable, ReentrancyGuard {
     function getUserInvestment(address user, uint256 index) external view returns (Investment memory) {
         if (index >= userInvestments[user].length) revert IndexOutOfBounds();
         return userInvestments[user][index];
+    }
+
+    /**
+     * @notice Get all direct referrals of a user
+     */
+    function getUserReferrals(address _user) external view returns (address[] memory) {
+        return users[_user].referrals;
+    }
+
+    /**
+     * @notice Get upline sponsor at a given depth
+     */
+    function getUserUpline(address _user, uint256 _depth) public view returns (address) {
+        address current = _user;
+        for (uint256 i = 0; i < _depth; i++) {
+            address sponsor = users[current].sponsor;
+            if (sponsor == address(0)) return owner();
+            current = sponsor;
+        }
+        return current;
+    }
+
+    /**
+     * @notice Check if a user has active capital
+     */
+    function isLevelActive(address _user, uint256 /* _level */) external view returns (bool) {
+        return users[_user].isRegistered && users[_user].activeCapital > 0;
+    }
+
+    /**
+     * @notice Check if a user account is registered in the system
+     */
+    function isUserRegistered(address _user) external view returns (bool) {
+        return users[_user].isRegistered || users[_user].isExist;
     }
 }

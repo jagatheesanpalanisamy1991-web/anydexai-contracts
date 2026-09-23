@@ -1,0 +1,9 @@
+{
+  "name": "anydexai-frontend",
+  "version": "1.0.0",
+  "description": "AnyDexAI Web3 dApp Frontend",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  }
+}

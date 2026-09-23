@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ANYDEXAI - 100% Decentralized Smart Contract Staking & Referral</title>
+  <title>ANYDEXAI - Decentralized Smart Contract Staking & Referral Protocol</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -39,13 +39,13 @@
       50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.7); }
     }
     .glow-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.3s ease;
     }
     .glow-card:hover {
-      border-color: rgba(16, 185, 129, 0.4);
+      border-color: rgba(6, 182, 212, 0.4);
       transform: translateY(-2px);
     }
     .btn-gradient {
@@ -53,7 +53,7 @@
       transition: all 0.3s ease;
     }
     .btn-gradient:hover {
-      opacity: 0.9;
+      opacity: 0.95;
       box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
     }
     .btn-gold {
@@ -61,7 +61,7 @@
       transition: all 0.3s ease;
     }
     .btn-gold:hover {
-      opacity: 0.9;
+      opacity: 0.95;
       box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
     }
     .nft-badge-locked {
@@ -72,15 +72,21 @@
       box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
       border-color: #f59e0b !important;
     }
+    .terminal-window {
+      background: #050813;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #1a2744;
+    }
   </style>
 </head>
-<body class="bg-brand-dark text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white">
+<body class="bg-brand-dark text-slate-100 min-h-screen font-sans antialiased selection:bg-cyan-500 selection:text-white flex flex-col">
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="sticky top-0 z-50 bg-brand-dark/90 backdrop-blur-md border-b border-brand-border">
+  <header class="sticky top-0 z-50 bg-brand-dark/95 backdrop-blur-md border-b border-brand-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo & Motto -->
       <div class="flex items-center space-x-3">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
           <i class="fa-solid fa-cube text-white text-xl"></i>
         </div>
         <div>
@@ -92,25 +98,183 @@
         </div>
       </div>
 
-      <!-- Network and Wallet Connection -->
-      <div class="flex items-center space-x-4">
-        <div id="networkBadge" class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-xs font-mono text-slate-300">
+      <!-- Network and Wallet Connection / Disconnect -->
+      <div class="flex items-center space-x-3">
+        <div id="networkBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-xs font-mono text-slate-300">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           <span id="networkName">Hardhat Local</span>
         </div>
 
-        <button id="btnConnect" onclick="connectWallet()" class="btn-gradient px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center space-x-2 text-white shadow-md">
-          <i class="fa-solid fa-wallet"></i>
-          <span id="walletBtnText">Connect Wallet</span>
+        <!-- Register CTA Button (Directly Accessible for New Users) -->
+        <button id="navRegisterBtn" onclick="openRegistrationModal()" class="px-3.5 py-2 rounded-xl btn-gradient text-xs font-bold text-white flex items-center space-x-1.5 shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+          <span>Register ($1k)</span>
         </button>
+
+        <!-- Disconnected Button -->
+        <div id="boxConnect" class="flex items-center">
+          <button onclick="connectWallet()" class="btn-gradient px-5 py-2 rounded-xl font-bold text-sm flex items-center space-x-2 text-white shadow-md">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Connect Wallet</span>
+          </button>
+        </div>
+
+        <!-- Connected State: ID Pill + Address + Owner Badge + Disconnect -->
+        <div id="boxConnected" class="hidden flex items-center space-x-2">
+          <!-- Owner Crown Badge -->
+          <span id="headerOwnerBadge" class="hidden text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-xl bg-gold/20 text-gold border border-gold/40 flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-crown text-[10px]"></i> OWNER
+          </span>
+
+          <!-- User ID Badge -->
+          <span id="headerUserIdBadge" class="text-xs font-mono font-bold px-2.5 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+            ID: <span id="navUserId">#1</span>
+          </span>
+
+          <!-- Address Pill -->
+          <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 font-mono text-xs text-slate-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="navUserAddress">0x0...000</span>
+            <button onclick="copyRefLink()" title="Copy Link" class="text-slate-400 hover:text-cyan-400 ml-1">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+
+          <!-- Disconnect Button -->
+          <button onclick="disconnectWallet()" title="Disconnect Wallet" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 text-xs font-semibold flex items-center space-x-1.5 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span class="hidden md:inline">Disconnect</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- USER IDENTITY PROFILE (LOCAL DB / LOCALSTORAGE) -->
+    <!-- DEDICATED REGISTRATION BANNER (HIGHLY VISIBLE & ACCESSIBLE FOR NEW USERS) -->
+    <div id="registrationHeroBanner" class="glow-card p-6 sm:p-8 rounded-3xl border-2 border-emerald-500/60 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40 relative overflow-hidden shadow-2xl">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+        <div class="space-y-4 max-w-xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1.5">
+              <i class="fa-solid fa-sparkles"></i> NEW INVESTOR REGISTRATION
+            </span>
+            <span class="text-[11px] font-mono text-gold bg-gold/10 px-3 py-1 rounded-full border border-gold/30 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-gold"></i> LEVEL 1 ENTRY PLAN ($1,000 USDT)
+            </span>
+          </div>
+
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+            Register & Activate Your AnyDexAI Account
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            All new investors register directly on the <strong>Level 1 Plan ($1,000 USDT)</strong>. Once registered, unlock higher tier packages, 5.0% monthly ROI up to 200% cap, 10 ADAI tokens, and your official Entry Pass NFT!
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-mono text-xs">
+            <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800 flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm shrink-0">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400">Monthly ROI</div>
+                <div class="font-bold text-emerald-400">5.0% / 30d</div>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800 flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-xl bg-gold/20 text-gold flex items-center justify-center text-sm shrink-0">
+                <i class="fa-solid fa-coins"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400">Welcome Reward</div>
+                <div class="font-bold text-gold">10 ADAI Coins</div>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800 flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm shrink-0">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400">NFT Pass</div>
+                <div class="font-bold text-cyan-300">Entry Pass #0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick 1-Click Registration Box -->
+        <div class="bg-slate-950/90 p-6 rounded-3xl border border-emerald-500/40 w-full lg:w-[420px] space-y-4 shadow-2xl shrink-0">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-sm">1-Click Registration</h3>
+                <p class="text-[10px] text-slate-400">Dual LocalDB & Blockchain Sync</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">1,000 USDT</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                <span class="flex items-center space-x-1.5">
+                  <i class="fa-solid fa-user text-cyan-400"></i>
+                  <span>Full Name / Username <span class="text-red-400">*</span></span>
+                </span>
+                <span class="text-[10px] text-slate-500">Saved to LocalDB</span>
+              </label>
+              <input type="text" id="heroRegName" placeholder="e.g. Satoshi Nakamoto" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                <span class="flex items-center space-x-1.5">
+                  <i class="fa-solid fa-phone text-emerald-400"></i>
+                  <span>Phone Number / Mobile <span class="text-red-400">*</span></span>
+                </span>
+                <span class="text-[10px] text-slate-500">Saved to LocalDB</span>
+              </label>
+              <input type="text" id="heroRegMobile" placeholder="e.g. +1 555-0199 or +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-emerald-400 focus:outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                <span class="flex items-center space-x-1.5">
+                  <i class="fa-solid fa-id-card-clip text-amber-400"></i>
+                  <span>Sponsor User ID or Address</span>
+                </span>
+                <span class="text-[10px] text-amber-400 font-mono">Default: Root #1</span>
+              </label>
+              <input type="text" id="heroRegSponsor" placeholder="1 or 0x..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs font-mono text-amber-300 placeholder-slate-600 focus:border-amber-400 focus:outline-none" />
+            </div>
+          </div>
+
+          <button onclick="executeHeroRegistration()" id="btnHeroRegister" class="w-full btn-gradient py-3.5 rounded-xl font-bold text-xs text-white flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 transition hover:scale-[1.02]">
+            <i class="fa-solid fa-bolt"></i>
+            <span id="btnHeroRegisterText">Register & Transfer 1,000 USDT</span>
+          </button>
+          
+          <div class="flex items-center justify-between text-[10px] text-slate-400 px-1 font-mono">
+            <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>No multi-click approval</span>
+            <span>Single 1-Click Tx</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER IDENTITY PROFILE (LOCAL DB / LOCALSTORAGE + USER ID) -->
     <div id="userProfileBanner" class="glow-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-emerald-500">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
@@ -119,24 +283,34 @@
         <div>
           <div class="flex items-center space-x-2">
             <h3 class="font-bold text-white text-base" id="profileDisplayName">Guest Investor</h3>
+            <span id="profileUserIdBadge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">User ID: #--</span>
             <span id="profileStatusBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400">Not Connected</span>
           </div>
           <div class="text-xs text-slate-400 flex flex-wrap gap-x-4 gap-y-1 mt-1 font-mono">
             <span><i class="fa-solid fa-phone text-slate-500 mr-1"></i><span id="profileDisplayMobile">N/A</span></span>
-            <span><i class="fa-solid fa-user-tag text-slate-500 mr-1"></i>Sponsor: <span id="profileDisplaySponsor" class="text-slate-300">None</span></span>
+            <span><i class="fa-solid fa-user-tag text-slate-500 mr-1"></i>Sponsor: <span id="profileDisplaySponsor" class="text-amber-300 font-bold">None</span></span>
             <span><i class="fa-solid fa-calendar-check text-slate-500 mr-1"></i>Since: <span id="profileDisplayRegistered">N/A</span></span>
           </div>
         </div>
       </div>
       <div class="flex items-center space-x-2">
+        <!-- Direct Quick Register button in profile banner if not registered -->
+        <button id="btnProfileRegister" onclick="openRegistrationModal()" class="px-3.5 py-2 rounded-xl btn-gold text-slate-950 text-xs font-bold flex items-center space-x-1.5 shadow">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Register ($1k)</span>
+        </button>
         <button onclick="openProfileModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition">
           <i class="fa-regular fa-pen-to-square text-emerald-400"></i>
           <span>Edit Profile</span>
         </button>
+        <button onclick="copyRefLink()" class="px-3.5 py-2 rounded-xl btn-gradient text-xs font-bold text-white flex items-center space-x-1.5 shadow">
+          <i class="fa-solid fa-share-nodes"></i>
+          <span>Copy Referral Link</span>
+        </button>
       </div>
     </div>
 
-    <!-- USER SUMMARY METRICS -->
+    <!-- USER SUMMARY METRICS (5 STAT CARDS) -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="glow-card p-5 rounded-2xl">
         <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
@@ -153,7 +327,7 @@
           <i class="fa-solid fa-chart-line text-cyan-400"></i>
         </div>
         <div class="text-2xl font-bold font-mono text-cyan-400" id="statPendingROI">$0.00</div>
-        <p class="text-[11px] text-slate-400 mt-1">Claimed: <span id="statRoiClaimed" class="text-slate-300 font-semibold">$0.00</span> / 200%</p>
+        <p class="text-[11px] text-slate-400 mt-1">Claimed: <span id="statRoiClaimed" class="text-slate-300 font-semibold">$0.00</span> / 200% Cap</p>
       </div>
 
       <div class="glow-card p-5 rounded-2xl">
@@ -174,7 +348,7 @@
         <p class="text-[11px] text-slate-400 mt-1">Min $10 &bull; Instant Transfer</p>
       </div>
 
-      <div class="glow-card p-5 rounded-2xl">
+      <div class="glow-card p-5 rounded-2xl md:col-span-2 lg:col-span-1">
         <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
           <span>TEAM VOLUME</span>
           <i class="fa-solid fa-users-viewfinder text-purple-400"></i>
@@ -206,7 +380,7 @@
           <div class="text-xs text-slate-400">Next Referral Deadline:</div>
           <div class="text-sm font-mono font-bold text-cyan-300" id="countdown120Day">Calculating...</div>
         </div>
-        <p class="text-[11px] text-slate-500 mt-2">
+        <p class="text-[11px] text-slate-500 mt-2" id="desc120Day">
           <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i>
           Active rule: refer at least 1 new member every 120 days to keep level income unlocked.
         </p>
@@ -258,11 +432,16 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="packagesContainer">
-        <!-- Package 1: $1,000 -->
-        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
+        <!-- Package 1: $1,000 (MANDATORY ENTRY FOR NEW REGISTRATIONS) -->
+        <div id="cardPkg1" class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border-2 border-emerald-500/50 shadow-xl shadow-emerald-500/10">
+          <div class="absolute -right-12 top-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-900 font-black text-[10px] uppercase tracking-widest py-1 px-12 rotate-45 shadow-md">
+            ENTRY PLAN
+          </div>
           <div>
             <div class="flex justify-between items-center mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Starter Pack</span>
+              <span id="badgePkg1" class="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                Level 1 Entry Plan
+              </span>
               <span class="text-xs font-mono text-slate-400">Plan #1</span>
             </div>
             <div class="text-3xl font-black font-mono text-white mb-2">$1,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
@@ -289,20 +468,19 @@
               </div>
             </div>
           </div>
-          <button onclick="handleInvestModal(1, 1000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
-            <span>Invest $1,000</span>
+          <button id="btnPkg1" onclick="handleInvestModal(1, 1000)" class="mt-6 w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20">
+            <span id="btnPkg1Text">Register & Stake $1,000 USDT</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </button>
         </div>
 
         <!-- Package 2: $5,000 -->
-        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border-2 border-emerald-500/50 shadow-xl shadow-emerald-500/10">
-          <div class="absolute -right-12 top-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-900 font-black text-[10px] uppercase tracking-widest py-1 px-12 rotate-45 shadow-md">
-            POPULAR
-          </div>
+        <div id="cardPkg2" class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
           <div>
             <div class="flex justify-between items-center mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Pro Growth</span>
+              <span id="badgePkg2" class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                Plan #2
+              </span>
               <span class="text-xs font-mono text-slate-400">Plan #2</span>
             </div>
             <div class="text-3xl font-black font-mono text-white mb-2">$5,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
@@ -329,17 +507,19 @@
               </div>
             </div>
           </div>
-          <button onclick="handleInvestModal(2, 5000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
-            <span>Invest $5,000</span>
+          <button id="btnPkg2" onclick="handleInvestModal(2, 5000)" class="mt-6 w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+            <span id="btnPkg2Text">Invest $5,000</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </button>
         </div>
 
         <!-- Package 3: $10,000 -->
-        <div class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
+        <div id="cardPkg3" class="glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60">
           <div>
             <div class="flex justify-between items-center mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Elite Master</span>
+              <span id="badgePkg3" class="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                Plan #3
+              </span>
               <span class="text-xs font-mono text-slate-400">Plan #3</span>
             </div>
             <div class="text-3xl font-black font-mono text-white mb-2">$10,000 <span class="text-xs font-normal text-slate-400">USDT</span></div>
@@ -366,8 +546,8 @@
               </div>
             </div>
           </div>
-          <button onclick="handleInvestModal(3, 10000)" class="mt-6 w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
-            <span>Invest $10,000</span>
+          <button id="btnPkg3" onclick="handleInvestModal(3, 10000)" class="mt-6 w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
+            <span id="btnPkg3Text">Invest $10,000</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </button>
         </div>
@@ -418,15 +598,21 @@
       <!-- Level Income Box -->
       <div class="glow-card p-6 rounded-2xl flex flex-col justify-between">
         <div>
-          <div class="flex items-center space-x-3 mb-3">
-            <div class="w-9 h-9 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-              <i class="fa-solid fa-sitemap"></i>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                <i class="fa-solid fa-sitemap"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white">5-Tier Level Income</h3>
+                <p class="text-[11px] text-slate-400">Accrued from downline level 1 to 5 volume</p>
+              </div>
             </div>
-            <div>
-              <h3 class="font-bold text-white">5-Tier Level Income</h3>
-              <p class="text-[11px] text-slate-400">Accrued from downline level 1 to 5 volume</p>
-            </div>
+            <span id="ownerLevelBadge" class="hidden text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/10 px-2.5 py-1 rounded-lg border border-gold/30 flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-crown text-[9px]"></i> Levels 1-5 Defaultly Unlocked
+            </span>
           </div>
+
           <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 mb-4 space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-xs text-slate-400">Accrued Level Volume Earnings:</span>
@@ -434,7 +620,7 @@
             </div>
             <div class="flex justify-between items-center text-[11px]">
               <span class="text-slate-500">Unpaid Carry-Forward Remainder:</span>
-              <span class="font-mono text-slate-300" id="cardRemainderLevel">$0.00</span>
+              <span class="font-mono text-emerald-400 font-bold" id="cardRemainderLevel">$0.00</span>
             </div>
           </div>
         </div>
@@ -476,7 +662,7 @@
         <div>
           <h2 class="text-xl font-black text-white flex items-center space-x-2">
             <span>ANYDEXAI NFT PROGRAM</span>
-            <span class="text-xs font-normal text-gold bg-gold/10 px-2 py-0.5 rounded border border-gold/30">9 Total NFTs (ERC-721 + ERC-165)</span>
+            <span class="text-xs font-normal text-gold bg-gold/10 px-2 py-0.5 rounded border border-gold/30">9 Total NFTs</span>
           </h2>
           <p class="text-xs text-slate-400">Every registration receives 1 Entry Pass NFT. Climb through 8 Royal Grade NFTs based on team business!</p>
         </div>
@@ -603,17 +789,17 @@
 
         <!-- Treasury Withdrawal -->
         <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-3">
-          <h4 class="font-bold text-xs uppercase text-slate-300">Admin Treasury Withdrawal</h4>
+          <h4 class="font-bold text-xs uppercase text-slate-300">Treasury Withdrawal</h4>
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Amount (USDT)</label>
-            <input type="number" id="adminWithdrawAmount" placeholder="1000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+            <label class="block text-[11px] text-slate-400 mb-1">Withdraw Amount (USDT)</label>
+            <input type="number" id="adminWithdrawAmount" placeholder="e.g. 5000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
           </div>
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Recipient Address</label>
             <input type="text" id="adminWithdrawRecipient" placeholder="0x..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono" />
           </div>
-          <button onclick="adminWithdrawTreasury()" class="w-full bg-red-600 hover:bg-red-500 py-2 rounded-xl font-bold text-xs text-white transition">
-            Withdraw Treasury USDT
+          <button onclick="adminWithdrawTreasury()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2 rounded-xl font-bold text-xs transition">
+            Execute Treasury Withdrawal
           </button>
         </div>
       </div>
@@ -621,84 +807,178 @@
 
   </main>
 
-  <!-- USER PROFILE MODAL (NAME & MOBILE NUMBER) -->
-  <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glow-card max-w-md w-full p-6 rounded-3xl border border-slate-700 space-y-4">
-      <div class="flex justify-between items-center">
-        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-          <i class="fa-solid fa-user-pen text-emerald-400"></i>
-          <span>Edit Investor Profile</span>
-        </h3>
-        <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white">
+  <!-- ========================================================================= -->
+  <!-- FOOTER & REAL-TIME PROTOCOL EVENT LOGS TERMINAL                           -->
+  <!-- ========================================================================= -->
+  <footer class="mt-auto border-t border-brand-border bg-slate-950/90 backdrop-blur-lg pt-6 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      
+      <!-- REAL-TIME PROTOCOL EVENT LOGS TERMINAL -->
+      <div class="glow-card rounded-2xl overflow-hidden border border-slate-800 shadow-xl">
+        <!-- Terminal Header -->
+        <div class="bg-slate-900/90 px-4 py-2.5 flex items-center justify-between border-b border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            </div>
+            <div class="text-xs font-mono text-slate-300 font-bold flex items-center space-x-2">
+              <i class="fa-solid fa-terminal text-emerald-400"></i>
+              <span>ANYDEXAI REAL-TIME PROTOCOL & TRANSACTION LOGS</span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-3 text-xs font-mono">
+            <span class="flex items-center space-x-1 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>LIVE</span>
+            </span>
+            <button onclick="clearTerminalLogs()" class="text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800 text-[10px] transition">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Terminal Output Window -->
+        <div id="terminalLogsContainer" class="terminal-window p-3.5 h-36 overflow-y-auto text-[11px] leading-relaxed text-slate-300 space-y-1">
+          <div class="text-slate-500">[SYSTEM] AnyDexAI Web3 Engine initialized. Awaiting user interaction...</div>
+          <div class="text-cyan-400">[CONFIG] Smart Contract: AnyDexAISingle.sol (Solidity ^0.8.26, Optimizer 200 runs)</div>
+        </div>
+      </div>
+
+      <!-- Bottom Credits and Links -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 pt-2 border-t border-slate-800/60 font-mono">
+        <div>&copy; 2026 ANYDEXAI Protocol. Single Smart Contract Architecture.</div>
+        <div class="flex items-center space-x-4">
+          <a href="#" class="hover:text-cyan-400 transition">Contract Source</a>
+          <a href="#" class="hover:text-cyan-400 transition">Audit Report</a>
+          <span class="text-emerald-400">● Operational</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS                                                                    -->
+  <!-- ========================================================================= -->
+
+  <!-- PROFILE EDIT MODAL -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glow-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-700 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-user-pen"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Edit Investor Profile</h3>
+            <p class="text-[11px] text-slate-400">Stored in browser LocalDB & IndexedDB</p>
+          </div>
+        </div>
+        <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <p class="text-xs text-slate-400">
-        Stored in your secure browser local database and linked to your wallet address.
-      </p>
+      <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between font-mono">
+        <span class="text-slate-400">Wallet:</span>
+        <span id="modalProfileWallet" class="text-emerald-400 font-semibold truncate max-w-[200px]">0x...</span>
+      </div>
 
       <div class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Investor Full Name</label>
-          <input type="text" id="editProfileName" placeholder="e.g. Arun Kumar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1.5">
+            <i class="fa-solid fa-user text-cyan-400"></i>
+            <span>Username / Full Name</span>
+          </label>
+          <input type="text" id="editProfileName" placeholder="e.g. Satoshi Nakamoto" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Contact Number</label>
-          <input type="text" id="editProfileMobile" placeholder="e.g. +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1.5">
+            <i class="fa-solid fa-phone text-emerald-400"></i>
+            <span>Phone / Mobile Number</span>
+          </label>
+          <input type="text" id="editProfileMobile" placeholder="e.g. +1 555-0199 or +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-emerald-400 focus:outline-none" />
         </div>
       </div>
 
-      <div class="pt-2">
-        <button onclick="saveProfileData()" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white">
-          Save Profile
-        </button>
-      </div>
+      <button onclick="saveProfileData()" class="w-full btn-gradient py-3 rounded-xl font-bold text-xs text-white flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Save Profile to LocalDB</span>
+      </button>
     </div>
   </div>
 
-  <!-- REGISTRATION / INVESTMENT MODAL -->
-  <div id="investModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glow-card max-w-md w-full p-6 rounded-3xl border border-slate-700 space-y-4">
-      <div class="flex justify-between items-center">
-        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-          <i class="fa-solid fa-wallet text-emerald-400"></i>
-          <span>Confirm Investment</span>
-        </h3>
-        <button onclick="closeInvestModal()" class="text-slate-400 hover:text-white">
+  <!-- SEAMLESS REGISTRATION & STAKING MODAL (1-CLICK AUTO APPROVE & TRANSFER) -->
+  <div id="investModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glow-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-700 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-bold text-white text-base" id="modalPackageName">Stake Package</h3>
+          <p class="text-xs text-slate-400">Seamless 1-Click Approval & Direct Transfer</p>
+        </div>
+        <button onclick="closeInvestModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-1">
-        <div class="text-xs text-slate-400">Selected Package:</div>
-        <div class="text-xl font-bold font-mono text-emerald-400" id="modalPackageName">Starter Pack ($1,000 USDT)</div>
+      <!-- Registration & User Info Notice Banner -->
+      <div id="modalRegNotice" class="text-xs p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+        <!-- Dynamically set in handleInvestModal -->
       </div>
 
-      <!-- Registration fields (Name & Mobile for local DB) -->
-      <div id="registrationFields" class="space-y-3">
+      <!-- Registration Fields -->
+      <div id="modalRegistrationFields" class="space-y-3 border-b border-slate-800 pb-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Your Full Name</label>
-          <input type="text" id="regName" placeholder="e.g. Arun Kumar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-user text-cyan-400"></i>
+              <span>Username / Full Name <span class="text-red-400">*</span></span>
+            </span>
+            <span class="text-[10px] text-slate-500">Saved to LocalDB</span>
+          </label>
+          <input type="text" id="modalRegName" placeholder="e.g. Satoshi Nakamoto" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Number</label>
-          <input type="text" id="regMobile" placeholder="e.g. +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-phone text-emerald-400"></i>
+              <span>Phone / Mobile Number <span class="text-red-400">*</span></span>
+            </span>
+            <span class="text-[10px] text-slate-500">Saved to LocalDB</span>
+          </label>
+          <input type="text" id="modalRegMobile" placeholder="e.g. +1 555-0199 or +91 9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-emerald-400 focus:outline-none" />
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Sponsor / Referrer Address</label>
-          <input type="text" id="regSponsor" placeholder="0x..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-emerald-500" />
+        <div id="modalSponsorContainer">
+          <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-id-card-clip text-amber-400"></i>
+              <span>Sponsor User ID or Address</span>
+            </span>
+            <span id="modalSponsorLabel" class="text-[10px] text-amber-400 font-mono">Default: Root #1</span>
+          </label>
+          <input type="text" id="modalRegSponsor" placeholder="1 or 0x..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs font-mono text-amber-300 placeholder-slate-600 focus:border-amber-400 focus:outline-none" />
         </div>
       </div>
 
-      <div class="space-y-2 pt-2">
-        <button id="btnApproveUsdt" onclick="approveUSDT()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 py-3 rounded-xl font-bold text-xs text-white flex items-center justify-center space-x-2">
-          <span>1. Approve USDT</span>
-        </button>
-        <button id="btnConfirmInvest" onclick="executeInvest()" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2">
-          <span>2. Confirm Stake</span>
+      <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 space-y-1">
+        <div>&bull; Monthly ROI: <span class="font-bold text-emerald-400">5.0% - 6.0%</span></div>
+        <div>&bull; 200% ROI Cap with 100% ADAI Capital Refund</div>
+        <div>&bull; Instant 1% Liquidity routing (0.5% Token + 0.5% NFT)</div>
+      </div>
+
+      <!-- SINGLE ACTION BUTTON: Transfers USDT from user (auto-approves if needed) -->
+      <div class="pt-2">
+        <button id="btnSeamlessStake" onclick="executeSeamlessStake()" class="w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-bolt"></i>
+          <span id="btnSeamlessStakeText">Confirm & Transfer 1,000 USDT</span>
         </button>
       </div>
+      <p class="text-[10px] text-slate-500 text-center">
+        Zero extra steps: handles USDT allowance automatically and executes registration in one smooth flow.
+      </p>
     </div>
   </div>
 
@@ -713,12 +993,14 @@
     </div>
   </div>
 
-  <!-- APPLICATION JAVASCRIPT LOGIC (ANYDEXAISINGLE SMART CONTRACT ENGINE) -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    let provider, signer, userAddress;
+    let provider, signer, userAddress = null;
     let mainContract, usdtContract, adaiContract, nftContract;
     let activePackageId = 1, activePackagePrice = 1000;
     let isOwner = false;
+    let currentUserId = 0;
+    let refreshTimer = null;
 
     const NFT_TIERS = [
       { id: 0, name: "Entry Pass", desc: "Welcome Pass", req: "On 1st Deposit", icon: "fa-ticket" },
@@ -728,150 +1010,327 @@
       { id: 4, name: "Lord Validator", desc: "Grade 4", req: "L4: 81 Users, $135k", icon: "fa-gem" },
       { id: 5, name: "Baren Hash", desc: "Grade 5", req: "L5: 243 Users, $405k", icon: "fa-dragon" },
       { id: 6, name: "Alpha Duke", desc: "Grade 6", req: "L6: 729 Users, $1.21M", icon: "fa-star" },
-      { id: 7, name: "Royal Archon", desc: "Grade 7", req: "L7: 2,187 Users, $3.64M", icon: "fa-certificate" },
-      { id: 8, name: "AnyDex Sovereign", desc: "Supreme Rank", req: "L8: 6,561 Users, $10.93M", icon: "fa-trophy" }
+      { id: 7, name: "Royal Archon", desc: "Grade 7", req: "L7: 2,187 Users, $3.64M", icon: "fa-sun" },
+      { id: 8, name: "AnyDex Sovereign", desc: "Grade 8", req: "L8: 6,561 Users, $10.9M", icon: "fa-meteor" }
     ];
 
     const LEVEL_REQUIREMENTS = [
-      { level: 1, roi: "1.00%", req: "5 members & $5,000 in L1" },
-      { level: 2, roi: "0.50%", req: "2 members in L2 & $9,000 in L2" },
-      { level: 3, roi: "0.50%", req: "2 members in L3 & $14,000 in L3" },
-      { level: 4, roi: "0.25%", req: "4 members in L4 & $18,000 in L4" },
-      { level: 5, roi: "0.25%", req: "5 members in L5 & $25,000 in L5" }
+      { level: 1, roi: "1.0% / 30d", req: "5 Directs + $5k L1 Team Vol" },
+      { level: 2, roi: "0.5% / 30d", req: "2 Members + $9k Cumulative L1..L2 Vol" },
+      { level: 3, roi: "0.5% / 30d", req: "2 Members + $14k Cumulative L1..L3 Vol" },
+      { level: 4, roi: "0.25% / 30d", req: "4 Members + $18k Cumulative L1..L4 Vol" },
+      { level: 5, roi: "0.25% / 30d", req: "5 Directs + $25k Cumulative L1..L5 Vol" },
     ];
 
     window.addEventListener("DOMContentLoaded", async () => {
+      logTerminal("[INIT] AnyDexAI Web3 Portal loaded. Ready.");
+      parseUrlReferral();
       renderNftGrid([], 0);
-      renderLevelTable([], []);
-      checkUrlReferrer();
 
-      if (window.ethereum) {
-        provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        if (accounts.length > 0) {
-          connectWallet();
-        }
+      if (window.ethereum && window.ethereum.selectedAddress) {
+        await connectWallet();
       }
     });
 
-    function checkUrlReferrer() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get("ref");
-      if (ref && ethers.isAddress(ref)) {
-        document.getElementById("regSponsor").value = ref;
+    function parseUrlReferral() {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        const input = document.getElementById("modalRegSponsor");
+        if (input) input.value = ref;
+        logTerminal(`[REFERRAL] URL Referral detected: ${ref}`);
       }
     }
 
-    async function connectWallet() {
-      if (!window.ethereum) {
-        showToast("Wallet Missing", "Please install MetaMask or TrustWallet to connect.", true);
-        return;
+    function logTerminal(message, type = "info") {
+      const container = document.getElementById("terminalLogsContainer");
+      if (!container) return;
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement("div");
+
+      let colorClass = "text-slate-300";
+      if (type === "success") colorClass = "text-emerald-400 font-semibold";
+      if (type === "error") colorClass = "text-red-400 font-semibold";
+      if (type === "warn") colorClass = "text-amber-400";
+
+      div.className = `${colorClass} flex items-start space-x-2`;
+      div.innerHTML = `<span class="text-slate-600 font-mono text-[10px] shrink-0">[${time}]</span> <span>${message}</span>`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function clearTerminalLogs() {
+      const container = document.getElementById("terminalLogsContainer");
+      if (container) {
+        container.innerHTML = `<div class="text-slate-500">[LOGS CLEARED] ${new Date().toLocaleTimeString()}</div>`;
       }
+    }
+
+    // =========================================================================
+    // LOCAL DATABASE MANAGER (LOCALSTORAGE + INDEXEDDB ENGINE)
+    // =========================================================================
+    const LocalDB = {
+      DB_NAME: "AnyDexAI_LocalDB",
+      DB_VERSION: 1,
+      STORE_USERS: "investor_profiles",
+
+      init() {
+        if (!window.indexedDB) return;
+        try {
+          const req = window.indexedDB.open(this.DB_NAME, this.DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(this.STORE_USERS)) {
+              const store = db.createObjectStore(this.STORE_USERS, { keyPath: "address" });
+              store.createIndex("id", "id", { unique: false });
+              store.createIndex("name", "name", { unique: false });
+            }
+          };
+        } catch (e) {
+          console.warn("LocalDB IndexedDB init fallback:", e);
+        }
+      },
+
+      saveUser(address, data) {
+        if (!address) return null;
+        const addr = address.toLowerCase();
+        const existing = this.getUser(addr) || {};
+
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        const record = {
+          address: addr,
+          name: (data.name !== undefined && data.name !== "") ? data.name : (existing.name || "Investor"),
+          mobile: (data.mobile !== undefined && data.mobile !== "") ? data.mobile : (existing.mobile || "N/A"),
+          sponsor: data.sponsor !== undefined ? data.sponsor : (existing.sponsor || "None"),
+          id: data.id !== undefined ? Number(data.id) : (existing.id || 0),
+          registeredAt: existing.registeredAt || data.registeredAt || formattedDate,
+          updatedAt: now.toISOString()
+        };
+
+        // 1. Primary LocalStorage
+        try {
+          localStorage.setItem(`anydex_user_${addr}`, JSON.stringify(record));
+        } catch (e) {
+          console.error("LocalDB storage error:", e);
+        }
+
+        // 2. Global Users Directory
+        try {
+          const dir = JSON.parse(localStorage.getItem("anydex_users_directory") || "{}");
+          dir[addr] = {
+            name: record.name,
+            mobile: record.mobile,
+            id: record.id,
+            sponsor: record.sponsor,
+            registeredAt: record.registeredAt
+          };
+          if (record.id > 0) {
+            dir[`id_${record.id}`] = addr;
+          }
+          localStorage.setItem("anydex_users_directory", JSON.stringify(dir));
+        } catch (e) {}
+
+        // 3. Async sync to IndexedDB
+        this.syncIndexedDB(record);
+
+        return record;
+      },
+
+      getUser(address) {
+        if (!address) return null;
+        const addr = address.toLowerCase();
+        try {
+          const item = localStorage.getItem(`anydex_user_${addr}`);
+          if (item) return JSON.parse(item);
+        } catch (e) {}
+        return null;
+      },
+
+      getUserById(id) {
+        try {
+          const dir = JSON.parse(localStorage.getItem("anydex_users_directory") || "{}");
+          const addr = dir[`id_${id}`];
+          if (addr && dir[addr]) return { address: addr, ...dir[addr] };
+        } catch (e) {}
+        return null;
+      },
+
+      getAllUsers() {
+        try {
+          return JSON.parse(localStorage.getItem("anydex_users_directory") || "{}");
+        } catch (e) {
+          return {};
+        }
+      },
+
+      syncIndexedDB(record) {
+        if (!window.indexedDB) return;
+        try {
+          const req = window.indexedDB.open(this.DB_NAME, this.DB_VERSION);
+          req.onsuccess = (e) => {
+            const db = e.target.result;
+            if (db.objectStoreNames.contains(this.STORE_USERS)) {
+              const tx = db.transaction(this.STORE_USERS, "readwrite");
+              tx.objectStore(this.STORE_USERS).put(record);
+            }
+          };
+        } catch (e) {}
+      }
+    };
+
+    // Initialize LocalDB
+    LocalDB.init();
+
+    // =========================================================================
+    // WALLET CONNECT & DISCONNECT
+    // =========================================================================
+    async function connectWallet() {
       try {
+        if (!window.ethereum) {
+          showToast("MetaMask Required", "Please install MetaMask to interact with AnyDexAI", true);
+          return;
+        }
+
+        logTerminal("[WALLET] Connecting wallet...");
         provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
 
-        document.getElementById("walletBtnText").innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
-        document.getElementById("refLinkText").innerText = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+        logTerminal(`[WALLET] Connected: ${userAddress}`, "success");
 
-        // Initialize contract instances from contracts-config.js
         const network = await provider.getNetwork();
         const chainId = Number(network.chainId);
-        let cfg = window.ANYDEX_CONFIG.networks.local;
-        if (chainId === 97) cfg = window.ANYDEX_CONFIG.networks.bscTestnet;
-        if (chainId === 56) cfg = window.ANYDEX_CONFIG.networks.bscMainnet;
+        const networks = window.ANYDEX_CONFIG ? window.ANYDEX_CONFIG.networks : {};
+        const cfg = Object.values(networks).find(n => n.chainId === chainId) || networks.local;
 
+        if (!cfg) {
+          throw new Error(`Unsupported chain ID ${chainId}. Please switch to Hardhat/BSC.`);
+        }
         document.getElementById("networkName").innerText = cfg.name;
 
-        // Use AnyDexAIMainPlan ABI compiled from AnyDexAISingle.sol
+        // Initialize Contracts
         mainContract = new ethers.Contract(cfg.mainContract, window.ANYDEX_CONFIG.abis.AnyDexAIMainPlan, signer);
         usdtContract = new ethers.Contract(cfg.usdtToken, window.ANYDEX_CONFIG.abis.USDT, signer);
         adaiContract = new ethers.Contract(cfg.adaiToken, window.ANYDEX_CONFIG.abis.ADAIToken, signer);
         nftContract = new ethers.Contract(cfg.nftContract, window.ANYDEX_CONFIG.abis.AnyDexAINFT, signer);
 
-        // Check if connected address is owner
+        // Check if Connected Wallet is Owner
         try {
           const ownerAddr = await mainContract.owner();
           isOwner = (ownerAddr.toLowerCase() === userAddress.toLowerCase());
           if (isOwner) {
+            document.getElementById("headerOwnerBadge").classList.remove("hidden");
             document.getElementById("adminPanel").classList.remove("hidden");
             document.getElementById("adminWithdrawRecipient").value = userAddress;
+            const oBadge = document.getElementById("ownerLevelBadge");
+            if (oBadge) oBadge.classList.remove("hidden");
+            logTerminal("[AUTH] Connected as Contract Deployer / Root Owner.", "success");
+          } else {
+            document.getElementById("headerOwnerBadge").classList.add("hidden");
+            document.getElementById("adminPanel").classList.add("hidden");
           }
         } catch (e) {
-          console.warn("Could not check contract owner:", e);
+          console.warn("Could not check owner:", e);
         }
 
-        // Load local user profile
-        loadLocalProfile();
+        // Toggle Navbar View
+        document.getElementById("boxConnect").classList.add("hidden");
+        document.getElementById("boxConnected").classList.remove("hidden");
+        document.getElementById("navUserAddress").innerText = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
 
-        showToast("Connected", `Wallet connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`);
+        // Sync and display user profile
+        loadLocalProfile();
         await refreshUserData();
 
-        // Refresh periodically
-        setInterval(refreshUserData, 15000);
+        if (refreshTimer) clearInterval(refreshTimer);
+        refreshTimer = setInterval(refreshUserData, 12000);
+
+        showToast("Connected", `Connected to ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`);
       } catch (err) {
-        console.error("Wallet connection error:", err);
-        showToast("Error", err.message || "Failed to connect wallet", true);
+        console.error("Connection error:", err);
+        logTerminal(`[ERROR] Connect failed: ${err.message}`, "error");
+        showToast("Error", err.message || "Failed to connect", true);
       }
     }
 
-    function loadLocalProfile() {
-      if (!userAddress) return;
-      const stored = localStorage.getItem(`anydex_user_${userAddress.toLowerCase()}`);
-      if (stored) {
-        try {
-          const data = JSON.parse(stored);
-          document.getElementById("profileDisplayName").innerText = data.name || "Investor";
-          document.getElementById("profileDisplayMobile").innerText = data.mobile || "N/A";
-          document.getElementById("editProfileName").value = data.name || "";
-          document.getElementById("editProfileMobile").value = data.mobile || "";
-        } catch (e) {}
-      }
+    function disconnectWallet() {
+      logTerminal(`[WALLET] Disconnected: ${userAddress || "User"}`);
+      userAddress = null;
+      signer = null;
+      isOwner = false;
+      currentUserId = 0;
+      if (refreshTimer) clearInterval(refreshTimer);
+
+      document.getElementById("boxConnect").classList.remove("hidden");
+      document.getElementById("boxConnected").classList.add("hidden");
+      document.getElementById("headerOwnerBadge").classList.add("hidden");
+      document.getElementById("adminPanel").classList.add("hidden");
+      document.getElementById("profileStatusBadge").innerText = "Not Connected";
+      document.getElementById("profileStatusBadge").className = "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400";
+      document.getElementById("profileUserIdBadge").innerText = "User ID: #--";
+      document.getElementById("navUserId").innerText = "#--";
+
+      // Reset profile banner
+      document.getElementById("profileDisplayName").innerText = "Guest Investor";
+      document.getElementById("profileDisplayMobile").innerText = "N/A";
+      document.getElementById("profileDisplaySponsor").innerText = "None";
+      document.getElementById("profileDisplayRegistered").innerText = "N/A";
+
+      // Reset registration banners & lock package 2 & 3 for new users
+      const heroBanner = document.getElementById("registrationHeroBanner");
+      if (heroBanner) heroBanner.classList.remove("hidden");
+      const navRegBtn = document.getElementById("navRegisterBtn");
+      if (navRegBtn) navRegBtn.classList.remove("hidden");
+      const btnProfReg = document.getElementById("btnProfileRegister");
+      if (btnProfReg) btnProfReg.classList.remove("hidden");
+
+      // Reset modal & hero inputs
+      document.getElementById("modalRegName").value = "";
+      document.getElementById("modalRegMobile").value = "";
+      document.getElementById("heroRegName").value = "";
+      document.getElementById("heroRegMobile").value = "";
+      document.getElementById("editProfileName").value = "";
+      document.getElementById("editProfileMobile").value = "";
+
+      updatePackageCards(false);
+
+      showToast("Disconnected", "Wallet disconnected successfully");
     }
 
-    function openProfileModal() {
-      if (!userAddress) {
-        showToast("Wallet Required", "Please connect your wallet first", true);
-        return;
-      }
-      document.getElementById("profileModal").classList.remove("hidden");
-    }
-
-    function closeProfileModal() {
-      document.getElementById("profileModal").classList.add("hidden");
-    }
-
-    function saveProfileData() {
-      if (!userAddress) return;
-      const name = document.getElementById("editProfileName").value.trim() || "Investor";
-      const mobile = document.getElementById("editProfileMobile").value.trim() || "N/A";
-
-      const key = `anydex_user_${userAddress.toLowerCase()}`;
-      let data = {};
-      try {
-        data = JSON.parse(localStorage.getItem(key) || "{}");
-      } catch (e) {}
-      data.name = name;
-      data.mobile = mobile;
-      localStorage.setItem(key, JSON.stringify(data));
-
-      document.getElementById("profileDisplayName").innerText = name;
-      document.getElementById("profileDisplayMobile").innerText = mobile;
-
-      closeProfileModal();
-      showToast("Profile Updated", "Investor details saved to local database successfully!");
-    }
-
+    // =========================================================================
+    // USER DATA SYNC & LEVEL INCOMES
+    // =========================================================================
     async function refreshUserData() {
       if (!mainContract || !userAddress) return;
 
       try {
-        // Query User struct from AnyDexAISingle.sol:AnyDexAIMainPlan
+        logTerminal(`[SYNC] Fetching on-chain profile for ${userAddress.slice(0, 6)}...`);
         const profile = await mainContract.users(userAddress);
         const adaiBal = await adaiContract.balanceOf(userAddress);
         const claimableLevel = await mainContract.calculateLevelIncome(userAddress);
-        const is120Active = await mainContract.is120DaysActive(userAddress);
+
+        // Fetch User ID
+        try {
+          const uId = await mainContract.addressToId(userAddress);
+          currentUserId = Number(uId);
+          if (currentUserId > 0) {
+            document.getElementById("navUserId").innerText = `#${currentUserId}`;
+            document.getElementById("profileUserIdBadge").innerText = `User ID: #${currentUserId}`;
+          } else {
+            document.getElementById("profileUserIdBadge").innerText = `Not Registered`;
+          }
+        } catch (e) {
+          console.warn("Could not query addressToId:", e);
+        }
 
         const activeCap = parseFloat(ethers.formatUnits(profile.activeCapital, 18));
         const totalInv = parseFloat(ethers.formatUnits(profile.totalCapitalInvested, 18));
@@ -889,25 +1348,85 @@
         document.getElementById("statAdaiBalance").innerText = adai.toFixed(2);
         document.getElementById("cardCurrentMonthAffiliate").innerText = `$${currentMonthEarned.toFixed(2)}`;
 
-        // Update Registration Profile UI
-        if (profile.isRegistered) {
-          document.getElementById("registrationFields").classList.add("hidden");
+        // Profile Identity Card & LocalDB Synchronization
+        const localUser = LocalDB.getUser(userAddress);
+        if (localUser && localUser.name) {
+          document.getElementById("profileDisplayName").innerText = localUser.name;
+        }
+        if (localUser && localUser.mobile) {
+          document.getElementById("profileDisplayMobile").innerText = localUser.mobile;
+        }
+        if (localUser && localUser.registeredAt) {
+          document.getElementById("profileDisplayRegistered").innerText = localUser.registeredAt;
+        }
+
+        if (isOwner) {
+          document.getElementById("profileStatusBadge").className = "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-gold/20 text-gold border border-gold/40 flex items-center gap-1";
+          document.getElementById("profileStatusBadge").innerHTML = `<i class="fa-solid fa-crown text-[9px]"></i> ROOT DEPLOYER / OWNER`;
+          document.getElementById("profileDisplaySponsor").innerText = "Genesis Root (#1)";
+          if (!localUser || !localUser.registeredAt) {
+            document.getElementById("profileDisplayRegistered").innerText = "Root Deployer";
+          }
+        } else if (profile.isRegistered) {
           document.getElementById("profileStatusBadge").className = "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
           document.getElementById("profileStatusBadge").innerText = "Registered Member";
 
-          const sponsorStr = profile.sponsor === ethers.ZeroAddress ? "Genesis (Owner)" : `${profile.sponsor.slice(0, 6)}...${profile.sponsor.slice(-4)}`;
-          document.getElementById("profileDisplaySponsor").innerText = sponsorStr;
-          document.getElementById("profileDisplayRegistered").innerText = "Active";
+          // Query sponsor ID & Name
+          let sponsorLabel = `${profile.sponsor.slice(0, 6)}...${profile.sponsor.slice(-4)}`;
+          try {
+            const spId = await mainContract.addressToId(profile.sponsor);
+            const spLocal = LocalDB.getUser(profile.sponsor) || LocalDB.getUserById(Number(spId));
+            const spName = spLocal ? ` (${spLocal.name})` : "";
+            if (Number(spId) > 0) {
+              sponsorLabel = `ID #${spId}${spName} [${sponsorLabel}]`;
+            }
+          } catch (e) {}
+
+          document.getElementById("profileDisplaySponsor").innerText = sponsorLabel;
+          if (!localUser || !localUser.registeredAt) {
+            document.getElementById("profileDisplayRegistered").innerText = "Active Member";
+          }
         } else {
-          document.getElementById("registrationFields").classList.remove("hidden");
+          document.getElementById("profileStatusBadge").className = "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400";
+          document.getElementById("profileStatusBadge").innerText = "Unregistered";
+          document.getElementById("profileDisplaySponsor").innerText = "None (Click Stake to Register)";
+          if (!localUser || !localUser.name) {
+            document.getElementById("profileDisplayName").innerText = "Guest Investor";
+          }
+          if (!localUser || !localUser.mobile) {
+            document.getElementById("profileDisplayMobile").innerText = "N/A";
+          }
         }
+
+        // Synchronize Registration Visibility and Lock State
+        const isUserRegistered = isOwner || profile.isRegistered;
+        const heroBanner = document.getElementById("registrationHeroBanner");
+        const navRegBtn = document.getElementById("navRegisterBtn");
+        const btnProfReg = document.getElementById("btnProfileRegister");
+
+        if (isUserRegistered) {
+          if (heroBanner) heroBanner.classList.add("hidden");
+          if (navRegBtn) navRegBtn.classList.add("hidden");
+          if (btnProfReg) btnProfReg.classList.add("hidden");
+        } else {
+          if (heroBanner) heroBanner.classList.remove("hidden");
+          if (navRegBtn) navRegBtn.classList.remove("hidden");
+          if (btnProfReg) btnProfReg.classList.remove("hidden");
+        }
+
+        updatePackageCards(isUserRegistered);
 
         // 120-Day Activity Countdown
         const lastRefTime = Number(profile.lastReferralTimestamp);
         const now = Math.floor(Date.now() / 1000);
         const deadline = lastRefTime + (120 * 86400);
 
-        if (lastRefTime === 0) {
+        if (isOwner) {
+          document.getElementById("badge120Day").className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gold/20 text-gold border border-gold/40 flex items-center gap-1";
+          document.getElementById("badge120Day").innerHTML = `<i class="fa-solid fa-crown text-[10px]"></i> Permanent Active (Owner)`;
+          document.getElementById("countdown120Day").innerText = "Permanent Exemption (Root Deployer)";
+          document.getElementById("desc120Day").innerHTML = `<i class="fa-solid fa-circle-check text-gold mr-1"></i> Owner account is permanently active with zero activity timeouts.`;
+        } else if (lastRefTime === 0) {
           document.getElementById("badge120Day").className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30";
           document.getElementById("badge120Day").innerText = "Pending 1st Referral";
           document.getElementById("countdown120Day").innerText = "No referrals yet";
@@ -925,12 +1444,19 @@
         }
 
         // 2x Monthly Ceiling Tracker
-        const maxAffiliate = activeCap * 2;
-        document.getElementById("ceilingMonthlyRatio").innerText = `$${currentMonthEarned.toFixed(2)} / $${maxAffiliate.toFixed(2)}`;
-        const percent = maxAffiliate > 0 ? Math.min(100, (currentMonthEarned / maxAffiliate) * 100) : 0;
-        document.getElementById("ceilingProgressBar").style.width = `${percent}%`;
+        if (isOwner) {
+          document.getElementById("ceilingMonthlyRatio").innerText = `$${currentMonthEarned.toFixed(2)} / Unrestricted (Owner Exemption)`;
+          document.getElementById("ceilingProgressBar").style.width = `100%`;
+          document.getElementById("ceilingProgressBar").className = "bg-gradient-to-r from-amber-500 to-yellow-400 h-full transition-all duration-500";
+        } else {
+          const maxAffiliate = activeCap * 2;
+          document.getElementById("ceilingMonthlyRatio").innerText = `$${currentMonthEarned.toFixed(2)} / $${maxAffiliate.toFixed(2)}`;
+          const percent = maxAffiliate > 0 ? Math.min(100, (currentMonthEarned / maxAffiliate) * 100) : 0;
+          document.getElementById("ceilingProgressBar").style.width = `${percent}%`;
+          document.getElementById("ceilingProgressBar").className = "bg-gradient-to-r from-emerald-500 to-cyan-500 h-full transition-all duration-500";
+        }
 
-        // Fetch User Investments & Calculate Total Accrued ROI
+        // Fetch Stakes Table
         const invCount = Number(await mainContract.getUserInvestmentsCount(userAddress));
         document.getElementById("userStakesCount").innerText = invCount;
 
@@ -982,25 +1508,33 @@
         document.getElementById("userNftCount").innerText = ownedNFTs.length;
         renderNftGrid(ownedNFTs, highestGrade);
 
-        // Downline Volume & Member Breakdown (Levels 1 to 5)
+        // Downline Volume, Member Breakdown & Level Eligibility
         const counts = [];
         const volumes = [];
+        const eligibilities = [];
         let totalVol = 0;
         for (let lvl = 1; lvl <= 5; lvl++) {
-          const [c, v] = await Promise.all([
+          const [c, v, elig] = await Promise.all([
             mainContract.userDownlineCount(userAddress, lvl),
-            mainContract.userDownlineVolume(userAddress, lvl)
+            mainContract.userDownlineVolume(userAddress, lvl),
+            mainContract.isLevelEligible(userAddress, lvl)
           ]);
           const mCount = Number(c);
           const mVol = parseFloat(ethers.formatUnits(v, 18));
           counts.push(mCount);
           volumes.push(mVol);
+          eligibilities.push(elig);
           totalVol += mVol;
         }
 
         document.getElementById("statDirectCount").innerText = counts[0] || 0;
         document.getElementById("statTeamVolume").innerText = `$${totalVol.toFixed(2)}`;
-        renderLevelTable(counts, volumes);
+        renderLevelTable(counts, volumes, eligibilities, isOwner);
+
+        // Update Affiliate Referral Link (using User ID if assigned)
+        const origin = window.location.origin + window.location.pathname;
+        const refVal = currentUserId > 0 ? currentUserId : userAddress;
+        document.getElementById("refLinkText").innerText = `${origin}?ref=${refVal}`;
 
       } catch (err) {
         console.error("Error refreshing user data:", err);
@@ -1086,42 +1620,241 @@
       });
     }
 
-    function renderLevelTable(counts, volumes) {
+    function renderLevelTable(counts, volumes, eligibilities = [], userIsOwner = false) {
       const tbody = document.getElementById("levelTableBody");
       tbody.innerHTML = "";
 
       LEVEL_REQUIREMENTS.forEach((req, idx) => {
         const count = counts[idx] || 0;
         const vol = volumes[idx] || 0;
+        const isEligible = eligibilities[idx] || userIsOwner;
         const tr = document.createElement("tr");
         tr.className = "hover:bg-slate-800/30 transition";
+
+        let statusBadge;
+        if (userIsOwner) {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gold/20 text-gold border border-gold/40 flex items-center gap-1 w-max">
+            <i class="fa-solid fa-crown text-[9px]"></i> MAX UNLOCKED (OWNER)
+          </span>`;
+        } else if (isEligible) {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            QUALIFIED
+          </span>`;
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-500 border border-slate-700">
+            PENDING
+          </span>`;
+        }
+
         tr.innerHTML = `
           <td class="py-2.5 font-bold text-white">Level ${req.level}</td>
           <td class="py-2.5 text-emerald-400 font-bold">${req.roi}</td>
-          <td class="py-2.5 text-slate-400">${req.req}</td>
+          <td class="py-2.5 text-slate-400">${userIsOwner ? '<span class="text-gold font-semibold">Exempt (Owner Root)</span>' : req.req}</td>
           <td class="py-2.5 text-slate-200">${count} users</td>
           <td class="py-2.5 text-slate-200">$${vol.toFixed(2)}</td>
           <td class="py-2.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-              count > 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-500"
-            }">
-              ${count > 0 ? "QUALIFIED" : "PENDING"}
-            </span>
+            ${statusBadge}
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // Modal & Transaction Handlers
-    function handleInvestModal(packId, price) {
-      if (!userAddress) {
-        showToast("Connect Wallet", "Please connect your wallet first", true);
+    // =========================================================================
+    // DYNAMIC PACKAGE LOCKING & ACCESSIBLE REGISTRATION HELPERS
+    // =========================================================================
+    function updatePackageCards(isRegistered) {
+      const cardPkg1 = document.getElementById("cardPkg1");
+      const badgePkg1 = document.getElementById("badgePkg1");
+      const btnPkg1 = document.getElementById("btnPkg1");
+      const btnPkg1Text = document.getElementById("btnPkg1Text");
+
+      const cardPkg2 = document.getElementById("cardPkg2");
+      const badgePkg2 = document.getElementById("badgePkg2");
+      const btnPkg2 = document.getElementById("btnPkg2");
+      const btnPkg2Text = document.getElementById("btnPkg2Text");
+
+      const cardPkg3 = document.getElementById("cardPkg3");
+      const badgePkg3 = document.getElementById("badgePkg3");
+      const btnPkg3 = document.getElementById("btnPkg3");
+      const btnPkg3Text = document.getElementById("btnPkg3Text");
+
+      if (!cardPkg1 || !cardPkg2 || !cardPkg3) return;
+
+      if (isRegistered) {
+        // Unlocked state for all packages
+        badgePkg1.innerText = "Starter Pack";
+        badgePkg1.className = "text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20";
+        btnPkg1Text.innerText = "Stake $1,000 USDT";
+        btnPkg1.onclick = () => handleInvestModal(1, 1000);
+
+        cardPkg2.className = "glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border-2 border-emerald-500/50 shadow-xl shadow-emerald-500/10";
+        badgePkg2.innerText = "Pro Growth";
+        badgePkg2.className = "text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20";
+        btnPkg2Text.innerText = "Stake $5,000 USDT";
+        btnPkg2.className = "mt-6 w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2";
+        btnPkg2.onclick = () => handleInvestModal(2, 5000);
+
+        cardPkg3.className = "glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-700/60";
+        badgePkg3.innerText = "Elite Master";
+        badgePkg3.className = "text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20";
+        btnPkg3Text.innerText = "Stake $10,000 USDT";
+        btnPkg3.className = "mt-6 w-full btn-gradient py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center space-x-2";
+        btnPkg3.onclick = () => handleInvestModal(3, 10000);
+      } else {
+        // Locked state: Level 1 is the mandatory entry plan for new users, Level 2 and 3 are locked!
+        badgePkg1.innerHTML = `<i class="fa-solid fa-star text-gold mr-1"></i> MANDATORY ENTRY PLAN`;
+        badgePkg1.className = "text-xs font-bold uppercase tracking-wider text-gold bg-gold/10 px-3 py-1 rounded-full border border-gold/30";
+        btnPkg1Text.innerText = "Register & Stake $1,000 USDT";
+        btnPkg1.onclick = () => handleInvestModal(1, 1000);
+
+        // Package 2 Locked
+        cardPkg2.className = "glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-800 bg-slate-950/60 opacity-80";
+        badgePkg2.innerHTML = `<i class="fa-solid fa-lock text-amber-400 mr-1 text-[10px]"></i> Locked for New Users`;
+        badgePkg2.className = "text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30 flex items-center";
+        btnPkg2Text.innerHTML = `<i class="fa-solid fa-lock text-amber-400 mr-1"></i> Requires Level 1 Registration`;
+        btnPkg2.className = "mt-6 w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 py-3.5 rounded-xl font-bold text-xs text-amber-300 flex items-center justify-center space-x-1.5 transition";
+        btnPkg2.onclick = () => handleLockedPackageClick(2, 5000);
+
+        // Package 3 Locked
+        cardPkg3.className = "glow-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-slate-800 bg-slate-950/60 opacity-80";
+        badgePkg3.innerHTML = `<i class="fa-solid fa-lock text-amber-400 mr-1 text-[10px]"></i> Locked for New Users`;
+        badgePkg3.className = "text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30 flex items-center";
+        btnPkg3Text.innerHTML = `<i class="fa-solid fa-lock text-amber-400 mr-1"></i> Requires Level 1 Registration`;
+        btnPkg3.className = "mt-6 w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 py-3.5 rounded-xl font-bold text-xs text-amber-300 flex items-center justify-center space-x-1.5 transition";
+        btnPkg3.onclick = () => handleLockedPackageClick(3, 10000);
+      }
+    }
+
+    function handleLockedPackageClick(packId, price) {
+      logTerminal(`[RESTRICTION] Plan #${packId} ($${price.toLocaleString()} USDT) is locked for new users. Registration is strictly on Level 1 Plan ($1,000 USDT). Redirecting...`, "warn");
+      showToast("Level 1 Entry Plan Required", `New investors must register on Level 1 Plan ($1,000 USDT) first. Plan #${packId} unlocks after your initial registration.`, true);
+      handleInvestModal(1, 1000);
+    }
+
+    function openRegistrationModal() {
+      handleInvestModal(1, 1000);
+    }
+
+    async function executeHeroRegistration() {
+      if (!window.ethereum) {
+        showToast("MetaMask Required", "Please install MetaMask to register with AnyDexAI", true);
         return;
       }
+      if (!userAddress) {
+        await connectWallet();
+        if (!userAddress) return;
+      }
+
+      const name = document.getElementById("heroRegName").value.trim();
+      const mobile = document.getElementById("heroRegMobile").value.trim();
+      let sponsorRaw = document.getElementById("heroRegSponsor").value.trim() || "1";
+
+      if (!name) {
+        showToast("Username Required", "Please enter your username / full name to register", true);
+        document.getElementById("heroRegName").focus();
+        return;
+      }
+      if (!mobile) {
+        showToast("Phone Required", "Please enter your phone / mobile number to register", true);
+        document.getElementById("heroRegMobile").focus();
+        return;
+      }
+
+      // Pre-fill modal fields
+      document.getElementById("modalRegName").value = name;
+      document.getElementById("modalRegMobile").value = mobile;
+      document.getElementById("modalRegSponsor").value = sponsorRaw;
+
+      // Force Level 1 Plan ($1,000 USDT)
+      activePackageId = 1;
+      activePackagePrice = 1000;
+
+      await handleInvestModal(1, 1000);
+      executeSeamlessStake();
+    }
+
+    // =========================================================================
+    // SEAMLESS STAKE / 1-CLICK REGISTRATION & TRANSFER
+    // =========================================================================
+    async function handleInvestModal(packId, price) {
+      if (!userAddress) {
+        await connectWallet();
+        if (!userAddress) return;
+      }
+
+      // Check on-chain registration state
+      let isRegistered = false;
+      try {
+        const userStruct = await mainContract.users(userAddress);
+        isRegistered = userStruct.isRegistered;
+      } catch (e) {}
+
+      // ENFORCE: New users MUST register on Level 1 Plan ($1,000 USDT) only, not Level 2 or Level 3
+      if (!isRegistered && !isOwner) {
+        if (packId !== 1) {
+          logTerminal(`[RESTRICTION] Direct registration on Plan #${packId} ($${price.toLocaleString()} USDT) is blocked. All new members must register with Level 1 Plan ($1,000 USDT). Redirected to Plan #1.`, "warn");
+          showToast("Level 1 Entry Plan Required", "All new members must register with Level 1 Plan ($1,000 USDT). Higher packages unlock after initial registration.", true);
+          packId = 1;
+          price = 1000;
+        }
+      }
+
       activePackageId = packId;
       activePackagePrice = price;
-      document.getElementById("modalPackageName").innerText = `Package #${packId} ($${price.toLocaleString()} USDT)`;
+
+      const modalTitle = (!isRegistered && !isOwner) 
+        ? `Registration — Level 1 Plan ($1,000 USDT)`
+        : `Package #${packId} ($${price.toLocaleString()} USDT)`;
+      
+      document.getElementById("modalPackageName").innerText = modalTitle;
+      document.getElementById("btnSeamlessStakeText").innerText = `Confirm & Transfer ${price.toLocaleString()} USDT`;
+
+      // Prefill with LocalDB data if exists
+      const localUser = LocalDB.getUser(userAddress);
+      if (localUser) {
+        if (localUser.name && !document.getElementById("modalRegName").value) {
+          document.getElementById("modalRegName").value = localUser.name;
+        }
+        if (localUser.mobile && !document.getElementById("modalRegMobile").value) {
+          document.getElementById("modalRegMobile").value = localUser.mobile;
+        }
+      }
+
+      const regNotice = document.getElementById("modalRegNotice");
+      const sponsorContainer = document.getElementById("modalSponsorContainer");
+
+      if (isRegistered || isOwner) {
+        const userNum = currentUserId > 0 ? `#${currentUserId}` : (isOwner ? "#1" : "Active");
+        regNotice.className = "text-xs p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-slate-300";
+        regNotice.innerHTML = `
+          <div class="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Registered Member (User ID ${userNum})</span>
+            </span>
+            <span class="text-[10px] text-emerald-400/80 font-mono px-2 py-0.5 rounded bg-emerald-500/10">Profile in LocalDB</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Your profile is registered on-chain. This stake tops up your active investment portfolio without requiring re-registration.</p>
+        `;
+        if (sponsorContainer) sponsorContainer.classList.add("hidden");
+      } else {
+        regNotice.className = "text-xs p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-slate-300";
+        regNotice.innerHTML = `
+          <div class="flex items-center justify-between text-cyan-400 font-semibold mb-1">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>New Member Registration — Level 1 Plan ($1,000 USDT)</span>
+            </span>
+            <span class="text-[10px] text-cyan-400/80 font-mono px-2 py-0.5 rounded bg-cyan-500/10">1-Click Auto Registration</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Enter your Username / Full Name and Phone Number. They will be saved to your browser local database and linked with your new on-chain User ID.</p>
+        `;
+        if (sponsorContainer) sponsorContainer.classList.remove("hidden");
+        const sponsorInput = document.getElementById("modalRegSponsor");
+        if (!sponsorInput.value) sponsorInput.value = "1"; // Default to Root Owner #1
+      }
+
       document.getElementById("investModal").classList.remove("hidden");
     }
 
@@ -1129,62 +1862,132 @@
       document.getElementById("investModal").classList.add("hidden");
     }
 
-    async function approveUSDT() {
-      try {
-        const amountWei = ethers.parseUnits(activePackagePrice.toString(), 18);
-        const mainAddress = await mainContract.getAddress();
-        showToast("Submitting Approval", "Please confirm USDT approval in your wallet...");
-        const tx = await usdtContract.approve(mainAddress, amountWei);
-        await tx.wait();
-        showToast("Approved", "USDT approved successfully! Proceed to Step 2.");
-        document.getElementById("btnApproveUsdt").className = "w-full bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 py-3 rounded-xl font-bold text-xs";
-        document.getElementById("btnApproveUsdt").innerText = "✓ USDT Approved";
-      } catch (err) {
-        console.error(err);
-        showToast("Approval Failed", err.reason || err.message, true);
-      }
-    }
+    async function executeSeamlessStake() {
+      const btn = document.getElementById("btnSeamlessStake");
+      const btnText = document.getElementById("btnSeamlessStakeText");
 
-    async function executeInvest() {
       try {
-        const name = document.getElementById("regName").value.trim() || "Investor";
-        const mobile = document.getElementById("regMobile").value.trim() || "N/A";
-        let sponsor = document.getElementById("regSponsor").value.trim();
+        const name = document.getElementById("modalRegName").value.trim();
+        const mobile = document.getElementById("modalRegMobile").value.trim();
+        let sponsorRaw = document.getElementById("modalRegSponsor").value.trim();
 
-        // If sponsor is empty or invalid, fallback to contract owner
-        if (!sponsor || !ethers.isAddress(sponsor)) {
-          sponsor = await mainContract.owner();
+        // Check on-chain registration state
+        let isRegistered = false;
+        try {
+          const profile = await mainContract.users(userAddress);
+          isRegistered = profile.isRegistered;
+        } catch (e) {}
+
+        // For new users registering, require username and phone number
+        if (!isRegistered && !isOwner) {
+          if (!name) {
+            showToast("Username Required", "Please enter your username / full name to register", true);
+            document.getElementById("modalRegName").focus();
+            return;
+          }
+          if (!mobile) {
+            showToast("Phone Required", "Please enter your phone / mobile number to register", true);
+            document.getElementById("modalRegMobile").focus();
+            return;
+          }
+
+          // Strictly enforce Level 1 Plan ($1,000 USDT) for new registrations
+          activePackageId = 1;
+          activePackagePrice = 1000;
         }
 
-        showToast("Staking", "Confirming investment in AnyDexAISingle smart contract...");
-
-        // Call registerAndInvest(sponsor, packageId) from AnyDexAISingle.sol
-        const tx = await mainContract.registerAndInvest(sponsor, activePackageId);
-        await tx.wait();
-
-        // Save investor details to local DB
-        localStorage.setItem(`anydex_user_${userAddress.toLowerCase()}`, JSON.stringify({
-          name: name,
-          mobile: mobile,
-          sponsor: sponsor,
-          registeredAt: new Date().toISOString()
-        }));
+        // Save immediately to LocalDB
+        LocalDB.saveUser(userAddress, {
+          name: name || "Investor",
+          mobile: mobile || "N/A",
+          sponsor: sponsorRaw,
+          id: currentUserId || 0
+        });
         loadLocalProfile();
 
-        showToast("Investment Successful!", `Staked $${activePackagePrice.toLocaleString()} USDT & received welcome Entry Pass NFT + ADAI!`);
+        btn.disabled = true;
+        btn.classList.add("opacity-75");
+
+        const amountWei = ethers.parseUnits(activePackagePrice.toString(), 18);
+        const mainAddress = await mainContract.getAddress();
+
+        // 1. Check current USDT allowance
+        logTerminal(`[TX] Checking USDT allowance for $${activePackagePrice.toLocaleString()}...`);
+        btnText.innerText = "Checking USDT Allowance...";
+        const currentAllowance = await usdtContract.allowance(userAddress, mainAddress);
+
+        if (currentAllowance < amountWei) {
+          logTerminal("[TX] Requesting USDT approval from wallet...");
+          btnText.innerText = "1. Confirming USDT Approval in MetaMask...";
+          showToast("Approve USDT", "Please confirm USDT approval in MetaMask...");
+          const approveTx = await usdtContract.approve(mainAddress, amountWei);
+          logTerminal(`[TX PENDING] Approval hash: ${approveTx.hash}`);
+          await approveTx.wait();
+          logTerminal("[TX CONFIRMED] USDT Approved successfully!", "success");
+        }
+
+        // 2. Execute Staking & Registration (Direct Transfer)
+        btnText.innerText = "2. Confirming Stake Transaction...";
+        showToast("Transferring USDT", `Transferring ${activePackagePrice.toLocaleString()} USDT to AnyDexAI Smart Contract...`);
+
+        let stakeTx;
+        // Determine whether sponsor is numeric ID or 0x address
+        if (/^\d+$/.test(sponsorRaw)) {
+          const sponsorId = Number(sponsorRaw);
+          logTerminal(`[TX] Executing registerAndInvestWithId(Sponsor ID #${sponsorId}, Pack #${activePackageId})...`);
+          stakeTx = await mainContract.registerAndInvestWithId(sponsorId, activePackageId);
+        } else {
+          let sponsorAddr = sponsorRaw;
+          if (!sponsorAddr || !ethers.isAddress(sponsorAddr)) {
+            sponsorAddr = await mainContract.owner();
+          }
+          logTerminal(`[TX] Executing registerAndInvest(Sponsor: ${sponsorAddr.slice(0, 6)}..., Pack #${activePackageId})...`);
+          stakeTx = await mainContract.registerAndInvest(sponsorAddr, activePackageId);
+        }
+
+        logTerminal(`[TX PENDING] Stake hash: ${stakeTx.hash}`);
+        await stakeTx.wait();
+
+        logTerminal(`[TX CONFIRMED] Staked $${activePackagePrice.toLocaleString()} USDT successfully!`, "success");
+
+        // 3. Query assigned on-chain User ID and sync LocalDB
+        try {
+          const newId = await mainContract.addressToId(userAddress);
+          currentUserId = Number(newId);
+          LocalDB.saveUser(userAddress, {
+            name: name || "Investor",
+            mobile: mobile || "N/A",
+            sponsor: sponsorRaw,
+            id: currentUserId
+          });
+          logTerminal(`[LOCAL-DB] Registered user '${name || "Investor"}' (Phone: ${mobile || "N/A"}) linked to on-chain User ID #${currentUserId}!`, "success");
+        } catch (e) {
+          console.warn("Could not query addressToId after stake:", e);
+        }
+
+        loadLocalProfile();
+        showToast("Registration Complete!", `Successfully staked $${activePackagePrice.toLocaleString()} USDT! Tokens and Entry Pass issued.`);
         closeInvestModal();
         await refreshUserData();
+
       } catch (err) {
-        console.error(err);
-        showToast("Investment Failed", err.reason || err.message, true);
+        console.error("Seamless stake failed:", err);
+        logTerminal(`[ERROR] Staking failed: ${err.reason || err.message}`, "error");
+        showToast("Staking Failed", err.reason || err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("opacity-75");
+        btnText.innerText = `Confirm & Transfer ${activePackagePrice.toLocaleString()} USDT`;
       }
     }
 
     async function claimSingleRoi(invIndex) {
       try {
+        logTerminal(`[TX] Harvesting ROI for stake #${invIndex + 1}...`);
         showToast("Claiming ROI", `Harvesting ROI for stake #${invIndex + 1}...`);
         const tx = await mainContract.claimRoi(invIndex);
         await tx.wait();
+        logTerminal(`[TX CONFIRMED] ROI harvested!`, "success");
         showToast("ROI Harvested", `ROI for stake #${invIndex + 1} transferred to your wallet!`);
         await refreshUserData();
       } catch (err) {
@@ -1195,9 +1998,11 @@
 
     async function claimLevelIncome() {
       try {
+        logTerminal(`[TX] Withdrawing 5-tier level income...`);
         showToast("Claiming Level Income", "Processing 5-tier level income withdrawal...");
         const tx = await mainContract.withdrawLevelIncome();
         await tx.wait();
+        logTerminal(`[TX CONFIRMED] Level income transferred!`, "success");
         showToast("Withdrawn!", "Level income sent directly to your USDT wallet!");
         await refreshUserData();
       } catch (err) {
@@ -1208,9 +2013,11 @@
 
     async function claimRoyalGrade(gradeId) {
       try {
+        logTerminal(`[TX] Verifying qualification and minting Royal NFT Grade #${gradeId}...`);
         showToast("Claiming NFT Grade", `Verifying qualification for Royal Grade #${gradeId}...`);
         const tx = await mainContract.claimNFTGrade(gradeId);
         await tx.wait();
+        logTerminal(`[TX CONFIRMED] Royal Grade #${gradeId} minted!`, "success");
         showToast("NFT Minted!", `Royal Grade #${gradeId} minted to your wallet!`);
         await refreshUserData();
       } catch (err) {
@@ -1219,17 +2026,103 @@
       }
     }
 
-    // Admin Control Actions
+    // =========================================================================
+    // PROFILE MODAL & LOCAL STORAGE
+    // =========================================================================
+    function openProfileModal() {
+      if (!userAddress) {
+        showToast("Wallet Required", "Please connect your wallet first", true);
+        return;
+      }
+      const walletEl = document.getElementById("modalProfileWallet");
+      if (walletEl) walletEl.innerText = `${userAddress.slice(0, 10)}...${userAddress.slice(-8)}`;
+
+      const user = LocalDB.getUser(userAddress);
+      if (user) {
+        document.getElementById("editProfileName").value = user.name || "";
+        document.getElementById("editProfileMobile").value = user.mobile || "";
+      } else if (isOwner) {
+        document.getElementById("editProfileName").value = "Protocol Owner";
+        document.getElementById("editProfileMobile").value = "";
+      } else {
+        document.getElementById("editProfileName").value = "";
+        document.getElementById("editProfileMobile").value = "";
+      }
+
+      document.getElementById("profileModal").classList.remove("hidden");
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.add("hidden");
+    }
+
+    function saveProfileData() {
+      if (!userAddress) return;
+      const name = document.getElementById("editProfileName").value.trim();
+      const mobile = document.getElementById("editProfileMobile").value.trim();
+
+      if (!name) {
+        showToast("Name Required", "Please enter your username / full name", true);
+        document.getElementById("editProfileName").focus();
+        return;
+      }
+
+      const saved = LocalDB.saveUser(userAddress, {
+        name: name,
+        mobile: mobile || "N/A",
+        id: currentUserId
+      });
+
+      document.getElementById("profileDisplayName").innerText = saved.name;
+      document.getElementById("profileDisplayMobile").innerText = saved.mobile;
+      document.getElementById("modalRegName").value = saved.name;
+      document.getElementById("modalRegMobile").value = saved.mobile;
+
+      closeProfileModal();
+      logTerminal(`[LOCAL-DB] Profile updated: ${saved.name} (Phone: ${saved.mobile})`, "success");
+      showToast("Profile Saved", "Investor username and phone saved to LocalDB!");
+    }
+
+    function loadLocalProfile() {
+      if (!userAddress) return;
+      const user = LocalDB.getUser(userAddress);
+
+      if (user) {
+        document.getElementById("profileDisplayName").innerText = user.name || (isOwner ? "Root Owner" : "Investor");
+        document.getElementById("profileDisplayMobile").innerText = user.mobile || "N/A";
+        if (user.registeredAt) {
+          document.getElementById("profileDisplayRegistered").innerText = user.registeredAt;
+        }
+        document.getElementById("editProfileName").value = user.name || "";
+        document.getElementById("editProfileMobile").value = user.mobile || "";
+        document.getElementById("modalRegName").value = user.name || "";
+        document.getElementById("modalRegMobile").value = user.mobile || "";
+      } else {
+        const defaultName = isOwner ? "Deployer / Owner" : (currentUserId > 0 ? `Investor #${currentUserId}` : "Guest Investor");
+        document.getElementById("profileDisplayName").innerText = defaultName;
+        document.getElementById("profileDisplayMobile").innerText = isOwner ? "Owner Root" : "Not Set (Click Edit Profile)";
+        document.getElementById("editProfileName").value = isOwner ? "Owner Root" : "";
+        document.getElementById("editProfileMobile").value = "";
+        document.getElementById("modalRegName").value = "";
+        document.getElementById("modalRegMobile").value = "";
+      }
+    }
+
+    // =========================================================================
+    // ADMIN ACTIONS
+    // =========================================================================
     async function adminUpdatePackage() {
       try {
         const pkgId = Number(document.getElementById("adminPkgId").value);
         const roiBps = Number(document.getElementById("adminPkgRoiBps").value);
         const duration = Number(document.getElementById("adminPkgDuration").value);
 
+        logTerminal(`[ADMIN] Updating Package #${pkgId}: ${roiBps}bps, ${duration}d...`);
         showToast("Admin Action", `Updating package #${pkgId} ROI & duration...`);
         const tx = await mainContract.updatePackageRoiAndDuration(pkgId, roiBps, duration);
         await tx.wait();
-        showToast("Package Updated", `Package #${pkgId} successfully updated in smart contract!`);
+        logTerminal(`[ADMIN CONFIRMED] Package updated!`, "success");
+        showToast("Package Updated", `Package #${pkgId} successfully updated!`);
         await refreshUserData();
       } catch (err) {
         console.error(err);
@@ -1244,9 +2137,11 @@
         const duration = Number(document.getElementById("adminNewDuration").value);
         const reward = ethers.parseUnits(document.getElementById("adminNewTokenReward").value, 18);
 
+        logTerminal(`[ADMIN] Creating new package: $${document.getElementById("adminNewAmount").value}...`);
         showToast("Admin Action", "Adding new investment package to smart contract...");
         const tx = await mainContract.addPackage(amount, roiBps, duration, reward);
         await tx.wait();
+        logTerminal(`[ADMIN CONFIRMED] New package added!`, "success");
         showToast("Package Created", "New package added to smart contract!");
         await refreshUserData();
       } catch (err) {
@@ -1265,9 +2160,11 @@
         }
 
         const amountWei = ethers.parseUnits(amountVal, 18);
+        logTerminal(`[ADMIN] Withdrawing $${amountVal} USDT to ${recipient.slice(0, 6)}...`);
         showToast("Admin Action", `Withdrawing ${amountVal} USDT from contract treasury...`);
         const tx = await mainContract.adminWithdrawUSDT(amountWei, recipient);
         await tx.wait();
+        logTerminal(`[ADMIN CONFIRMED] Treasury withdrawn!`, "success");
         showToast("Treasury Withdrawn", `${amountVal} USDT transferred to ${recipient.slice(0, 6)}...`);
         await refreshUserData();
       } catch (err) {

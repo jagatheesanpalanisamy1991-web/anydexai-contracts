@@ -137,6 +137,37 @@ contract AnyDexAINFT is IAnyDexAINFT, Ownable {
         return tokenId;
     }
 
+    function hasTierNFT(address user, uint8 tier) external view override returns (bool) {
+        if (tier == 0) return _hasEntryPass[user];
+        return _userHasGrade[user][tier];
+    }
+
+    function mintGradeNFT(address to, uint8 tier) external override onlyMinter returns (uint256) {
+        if (tier == 0) {
+            if (to == address(0)) revert ZeroAddress();
+            if (_hasEntryPass[to]) revert AlreadyHasEntryPass();
+            uint256 tokenId = _nextTokenId++;
+            _hasEntryPass[to] = true;
+            tokenGrade[tokenId] = 0;
+            _mint(to, tokenId);
+            emit NFTMinted(to, tokenId, 0);
+            return tokenId;
+        } else {
+            if (to == address(0)) revert ZeroAddress();
+            if (tier > 8) revert InvalidRoyalGrade();
+            if (_userHasGrade[to][tier]) revert AlreadyHasGrade();
+            uint256 tokenId = _nextTokenId++;
+            _userHasGrade[to][tier] = true;
+            tokenGrade[tokenId] = tier;
+            if (tier > _userHighestGrade[to]) {
+                _userHighestGrade[to] = tier;
+            }
+            _mint(to, tokenId);
+            emit NFTMinted(to, tokenId, tier);
+            return tokenId;
+        }
+    }
+
     function setMinter(address minterAddress, bool status) external onlyOwner {
         if (minterAddress == address(0)) revert ZeroAddress();
         minters[minterAddress] = status;

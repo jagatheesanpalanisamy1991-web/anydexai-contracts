@@ -676,6 +676,25 @@ window.ANYDEX_CONFIG = {
       {
         "inputs": [
           {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "name": "addressToId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
@@ -802,6 +821,44 @@ window.ANYDEX_CONFIG = {
       {
         "inputs": [
           {
+            "internalType": "uint256",
+            "name": "userId",
+            "type": "uint256"
+          }
+        ],
+        "name": "getUserAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "userAddr",
+            "type": "address"
+          }
+        ],
+        "name": "getUserId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "user",
             "type": "address"
@@ -879,6 +936,25 @@ window.ANYDEX_CONFIG = {
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "idToAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
           }
         ],
         "stateMutability": "view",
@@ -1124,6 +1200,24 @@ window.ANYDEX_CONFIG = {
         "inputs": [
           {
             "internalType": "uint256",
+            "name": "sponsorId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "packageId",
+            "type": "uint256"
+          }
+        ],
+        "name": "registerAndInvestWithId",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
             "name": "newRate",
             "type": "uint256"
           }
@@ -1292,6 +1386,19 @@ window.ANYDEX_CONFIG = {
             "internalType": "address",
             "name": "",
             "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalUsers",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
@@ -1501,6 +1608,11 @@ window.ANYDEX_CONFIG = {
         ],
         "name": "users",
         "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
           {
             "internalType": "bool",
             "name": "isRegistered",
@@ -2219,6 +2331,25 @@ window.ANYDEX_CONFIG = {
       {
         "inputs": [
           {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "name": "addressToId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
@@ -2345,6 +2476,44 @@ window.ANYDEX_CONFIG = {
       {
         "inputs": [
           {
+            "internalType": "uint256",
+            "name": "userId",
+            "type": "uint256"
+          }
+        ],
+        "name": "getUserAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "userAddr",
+            "type": "address"
+          }
+        ],
+        "name": "getUserId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "user",
             "type": "address"
@@ -2422,6 +2591,25 @@ window.ANYDEX_CONFIG = {
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "idToAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
           }
         ],
         "stateMutability": "view",
@@ -2667,6 +2855,24 @@ window.ANYDEX_CONFIG = {
         "inputs": [
           {
             "internalType": "uint256",
+            "name": "sponsorId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "packageId",
+            "type": "uint256"
+          }
+        ],
+        "name": "registerAndInvestWithId",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
             "name": "newRate",
             "type": "uint256"
           }
@@ -2835,6 +3041,19 @@ window.ANYDEX_CONFIG = {
             "internalType": "address",
             "name": "",
             "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalUsers",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
@@ -3044,6 +3263,11 @@ window.ANYDEX_CONFIG = {
         ],
         "name": "users",
         "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
           {
             "internalType": "bool",
             "name": "isRegistered",

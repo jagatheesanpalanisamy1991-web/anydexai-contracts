@@ -37,9 +37,20 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-server.listen(PORT, () => {
-  console.log("==================================================");
-  console.log(`ANYDEXAI Web3 dApp Frontend running at:`);
-  console.log(`👉 http://localhost:${PORT}`);
-  console.log("==================================================");
-});
+function startServer(port) {
+  server.listen(port, () => {
+    console.log("==================================================");
+    console.log(`ANYDEXAI Web3 dApp Frontend running at:`);
+    console.log(`👉 http://localhost:${port}`);
+    console.log("==================================================");
+  }).on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.warn(`Port ${port} in use, trying port ${Number(port) + 1}...`);
+      startServer(Number(port) + 1);
+    } else {
+      console.error("Server error:", err);
+    }
+  });
+}
+
+startServer(PORT);

@@ -22,8 +22,8 @@ describe("ANYDEXAI Smart Contract Suite", function () {
     await adaiToken.waitForDeployment();
 
     // 3. Deploy AnyDexAINFT
-    const AnyDexAINFT = await ethers.getContractFactory("AnyDexAINFT");
-    anyDexNFT = await AnyDexAINFT.deploy("https://api.anydexai.com/metadata/nft/");
+    const AnyDexAINFT = await ethers.getContractFactory("contracts/AnyDexAINFT.sol:AnyDexAINFT");
+    anyDexNFT = await AnyDexAINFT.deploy(owner.address, "https://api.anydexai.com/metadata/nft/");
     await anyDexNFT.waitForDeployment();
 
     // 4. Deploy AnyDexAIMain
